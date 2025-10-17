@@ -54,7 +54,7 @@ public class Main {
     }
 
     public void run() {
-        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+        System.out.println("Hello PointEngine " + "1.0.1 " + "!");
         init();
         loop();
 
@@ -78,23 +78,6 @@ public class Main {
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-                switch (key) {
-                    case GLFW_KEY_E -> posY += Speed;
-                    case GLFW_KEY_Q -> posY -= Speed;
-                    case GLFW_KEY_A -> posX -= Speed;
-                    case GLFW_KEY_D -> posX += Speed;
-                    case GLFW_KEY_S -> posZ += Speed;
-                    case GLFW_KEY_W -> posZ -= Speed;
-                    case GLFW_KEY_EQUAL -> Size += 0.1f;
-                    case GLFW_KEY_MINUS -> Size -= 0.1f;
-                }
-            }
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(window, true);
-        });
-
         try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1);
             IntBuffer pHeight = stack.mallocInt(1);
@@ -110,6 +93,21 @@ public class Main {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
         glfwShowWindow(window);
+    }
+
+    private void processInput(float devSpeed, float ScaleSpeed) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) posZ -= devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) posY += devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) posX -= devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) posX += devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) posY -= devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) posZ += devSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) Size += ScaleSpeed;
+        if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) Size -= ScaleSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
     }
 
     private void loop() {
@@ -172,6 +170,8 @@ public class Main {
         projection.get(projectionBuf);
 
         while (!glfwWindowShouldClose(window)) {
+
+            processInput(0.05f, 0.01f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             s.use();
