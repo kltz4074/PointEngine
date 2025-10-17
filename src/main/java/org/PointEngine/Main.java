@@ -1,52 +1,52 @@
 package org.PointEngine;
 
 import org.joml.Matrix4f;
-import org.lwjgl.*;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
+import org.lwjgl.system.MemoryStack;
 
-import java.nio.*;
+import java.lang.reflect.Array;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.PointEngine.GameObject;
 
 public class Main {
 
     Shader s;
 
     private long window;
-    private float Speed = 0.05f;
-    private float posX = 0.0f, posY = 0.0f, posZ = -5.0f;
-    private float angle = 0.0f;
     public float Size = 0.33f;
+    public GameObject Player;
+    List<GameObject> objects = new ArrayList<>();
 
     float[] vertices = {
-            // Позиция XYZ + Цвет RGB
-            -0.5f, -0.5f,  0.5f,  1f, 0f, 0f, // перед
+            // position XYZ + color RGB
+            -0.5f, -0.5f,  0.5f,  1f, 0f, 0f,
             0.5f, -0.5f,  0.5f,  1f, 0f, 0f,
             0.5f,  0.5f,  0.5f,  1f, 0f, 0f,
             -0.5f,  0.5f,  0.5f,  1f, 0f, 0f,
-
-            -0.5f, -0.5f, -0.5f,  0f, 1f, 0f, // зад
+            -0.5f, -0.5f, -0.5f,  0f, 1f, 0f,
             0.5f, -0.5f, -0.5f,  0f, 1f, 0f,
             0.5f,  0.5f, -0.5f,  0f, 1f, 0f,
             -0.5f,  0.5f, -0.5f,  0f, 1f, 0f
     };
 
     int[] indices = {
-            0, 1, 2, 2, 3, 0,       // перед
-            4, 5, 6, 6, 7, 4,       // зад
-            0, 4, 7, 7, 3, 0,       // лево
-            1, 5, 6, 6, 2, 1,       // право
-            3, 2, 6, 6, 7, 3,       // верх
-            0, 1, 5, 5, 4, 0        // низ
+            0, 1, 2, 2, 3, 0,
+            4, 5, 6, 6, 7, 4,
+            0, 4, 7, 7, 3, 0,
+            1, 5, 6, 6, 2, 1,
+            3, 2, 6, 6, 7, 3,
+            0, 1, 5, 5, 4, 0
     };
 
     public static void main(String[] args) {
@@ -54,7 +54,7 @@ public class Main {
     }
 
     public void run() {
-        System.out.println("Hello PointEngine " + "1.0.1 " + "!");
+        System.out.println("Hello PointEngine 1.0.1!");
         init();
         loop();
 
@@ -93,19 +93,28 @@ public class Main {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
         glfwShowWindow(window);
+
+        // Колбэк изменения размера окна
+        glfwSetFramebufferSizeCallback(window, (win, width, height) -> {
+            glViewport(0, 0, width, height);
+        });
     }
 
     private void processInput(float devSpeed, float ScaleSpeed) {
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) posZ -= devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) posY += devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) posX -= devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) posX += devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) posY -= devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) posZ += devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) Player.z -= devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) Player.z += devSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) Player.x -= devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) Player.x += devSpeed;
+
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) Player.y += devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) Player.y -= devSpeed;
 
         if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) Size += ScaleSpeed;
         if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) Size -= ScaleSpeed;
 
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) Player.rotation -= 0.5;
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) Player.rotation += 0.5;
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
     }
@@ -123,7 +132,7 @@ public class Main {
                         "void main() {\n" +
                         "    gl_Position = projection * model * vec4(aPos, 1.0);\n" +
                         "    vertexColor = aColor;\n" +
-                        "}\n";
+                        "}";
 
         String fragCode =
                 "#version 330 core\n" +
@@ -135,71 +144,71 @@ public class Main {
 
         s = new Shader(vertCode, fragCode);
 
-        int vao = glGenVertexArrays();
-        glBindVertexArray(vao);
+        int vao = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vao);
 
-        int vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        int vbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STATIC_DRAW);
 
-        int ebo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+        int ebo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ebo);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, GL15.GL_STATIC_DRAW);
 
         int stride = 6 * Float.BYTES;
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3L * Float.BYTES);
-        glEnableVertexAttribArray(1);
+        GL20.glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3L * Float.BYTES);
+        GL20.glEnableVertexAttribArray(1);
 
-        glBindVertexArray(0);
+        GL30.glBindVertexArray(0);
 
         glEnable(GL_DEPTH_TEST);
         glClearColor(0f, 0f, 0f, 1f);
 
-        IntBuffer width = BufferUtils.createIntBuffer(1);
-        IntBuffer height = BufferUtils.createIntBuffer(1);
-        glfwGetFramebufferSize(window, width, height);
-        Matrix4f projection = new Matrix4f().perspective(
-                (float) Math.toRadians(45.0),
-                (float) width.get(0) / height.get(0),
-                0.1f, 100f
-        );
-
-        FloatBuffer projectionBuf = BufferUtils.createFloatBuffer(16);
-        projection.get(projectionBuf);
+        objects.add(new GameObject(0f, 0f, -5f, 0.5f));
+        objects.add(new GameObject(0f, 1f, -5f, 0.5f));
+        Player = new GameObject(0f, -1f, -5f, 0.5f);
+        objects.add(Player);
 
         while (!glfwWindowShouldClose(window)) {
 
-            processInput(0.05f, 0.01f);
+            processInput(0.02f, 0.01f);
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             s.use();
 
-            Matrix4f model = new Matrix4f()
-                    .translate(posX, posY, posZ)
-                    .rotateY((float) Math.toRadians(angle))
-                    .scale(Size);
+            // Получаем текущий размер фреймбуфера каждый кадр
+            IntBuffer width = BufferUtils.createIntBuffer(1);
+            IntBuffer height = BufferUtils.createIntBuffer(1);
+            glfwGetFramebufferSize(window, width, height);
 
-            FloatBuffer modelBuf = BufferUtils.createFloatBuffer(16);
-            model.get(modelBuf);
+            // Обновляем glViewport
+            glViewport(0, 0, width.get(0), height.get(0));
+
+            // Пересчитываем матрицу проекции
+            Matrix4f projection = new Matrix4f().perspective(
+                    (float)Math.toRadians(45.0),
+                    (float)width.get(0) / height.get(0),
+                    0.1f, 100f
+            );
+            FloatBuffer projectionBuf = BufferUtils.createFloatBuffer(16);
+            projection.get(projectionBuf);
 
             s.setMatrix4f("projection", projectionBuf);
-            s.setMatrix4f("model", modelBuf);
 
-            glBindVertexArray(vao);
-            glDrawElements(GL_TRIANGLES, indices.length, GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-
-            angle += 0.5f;
+            for (GameObject obj : objects) {
+                obj.render(s, vao, indices.length);
+            }
 
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
 
         s.delete();
-        glDeleteVertexArrays(vao);
-        glDeleteBuffers(vbo);
-        glDeleteBuffers(ebo);
+        GL30.glDeleteVertexArrays(vao);
+        GL15.glDeleteBuffers(vbo);
+        GL15.glDeleteBuffers(ebo);
     }
 }
