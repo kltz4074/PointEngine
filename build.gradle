@@ -41,7 +41,7 @@ application {
 shadowJar {
     archiveBaseName.set('PointEngine')
     archiveClassifier.set('')
-    archiveVersion.set('1.0.0')
+    archiveVersion.set('1.0.1')
     manifest {
         attributes 'Main-Class': 'org.PointEngine.Main'
     }
