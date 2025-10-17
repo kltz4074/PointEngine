@@ -1,6 +1,7 @@
 package org.PointEngine;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -113,8 +114,12 @@ public class Main {
         if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) Size += ScaleSpeed;
         if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) Size -= ScaleSpeed;
 
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) Player.rotation -= 0.5;
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) Player.rotation += 0.5;
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) Player.rotation.add(0.5, 0, 0);
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) Player.rotation.add(-0.5, 0, 0);
+
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) Player.rotation.add(0, -0.5, 0);
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) Player.rotation.add(0, 0.5, 0);
+
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
     }
@@ -166,9 +171,9 @@ public class Main {
         glEnable(GL_DEPTH_TEST);
         glClearColor(0f, 0f, 0f, 1f);
 
-        objects.add(new GameObject(0f, 0f, -5f, 0.5f));
-        objects.add(new GameObject(0f, 1f, -5f, 0.5f));
-        Player = new GameObject(0f, -1f, -5f, 0.5f);
+        objects.add(new GameObject(0f, 0f, -5f, 0.5f, new Vector3d()));
+        objects.add(new GameObject(0f, 1f, -5f, 0.5f, new Vector3d()));
+        Player = new GameObject(0f, -1f, -5f, 0.5f, new Vector3d());
         objects.add(Player);
 
         while (!glfwWindowShouldClose(window)) {
@@ -179,15 +184,14 @@ public class Main {
 
             s.use();
 
-            // Получаем текущий размер фреймбуфера каждый кадр
             IntBuffer width = BufferUtils.createIntBuffer(1);
             IntBuffer height = BufferUtils.createIntBuffer(1);
             glfwGetFramebufferSize(window, width, height);
 
-            // Обновляем glViewport
+            // updating glViewport
             glViewport(0, 0, width.get(0), height.get(0));
 
-            // Пересчитываем матрицу проекции
+            // recalculate matrix projection
             Matrix4f projection = new Matrix4f().perspective(
                     (float)Math.toRadians(45.0),
                     (float)width.get(0) / height.get(0),
