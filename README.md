@@ -32,8 +32,19 @@ It currently supports basic rendering and shader functionality, making it easy t
 
 ### Build
 
-You can build the engine and your game with a single command:
+#### build crossplatform jar on **linux**: (tested on archlinux)
+you need to be in root of the project
 
+```bash
+./gradlew shadowJar
+```
+example run command:
+
+```bash
+java -jar build/libs/PointEngine-1.0.0.jar
+```
+
+#### how to buld for windows:
 ```bash
 gradlew shadowJar launch4j
 ```
