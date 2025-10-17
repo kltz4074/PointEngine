@@ -17,7 +17,7 @@ It currently supports basic rendering and shader functionality, making it easy t
 | Shader support        | Vertex and fragment shaders supported                        |
 | Rendering             | Currently renders 3D objects like a cube                     |
 | Build options         | Build into `.exe` or optionally `.jar`                       |
-| Cross-platform        | Potentially cross-platform; currently tested on Windows only |
+| Cross-platform        | tested on windows 11, archlinux, and it supports on macos, (but not tested) |
 | Python scripting      | Use Python to script game logic and behaviors                |
 
 ---
@@ -28,7 +28,7 @@ It currently supports basic rendering and shader functionality, making it easy t
 
 * **Java JDK 17**
 * **Gradle 8.1.1**
-* Windows (for now; Linux/Mac support will be tested later)
+* PointEngine is crossplatform! (tested on archlinux and windows 11)
 
 ### Build
 
