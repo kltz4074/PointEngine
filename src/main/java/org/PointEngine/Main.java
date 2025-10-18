@@ -1,5 +1,6 @@
 package org.PointEngine;
 
+import org.PointEngine.src.components.Camera;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.lwjgl.BufferUtils;
@@ -7,7 +8,6 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 
-import java.lang.reflect.Array;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -18,16 +18,19 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.PointEngine.GameObject;
+import org.PointEngine.src.components.GameObject;
 
 public class Main {
-
     Shader s;
 
     private long window;
     public float Size = 0.33f;
     public GameObject Player;
+    public Camera camera;
+
+
     List<GameObject> objects = new ArrayList<>();
+
 
     float[] vertices = {
             // position XYZ + color RGB
@@ -55,7 +58,7 @@ public class Main {
     }
 
     public void run() {
-        System.out.println("Hello PointEngine 1.0.1!");
+        System.out.println("PointEngine 1.0.1!");
         init();
         loop();
 
@@ -101,43 +104,87 @@ public class Main {
         });
     }
 
-    private void processInput(float devSpeed, float ScaleSpeed) {
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) Player.z -= devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) Player.z += devSpeed;
+    private void processInput(float devSpeed, float rotSpeed) {
+        // --- вычисляем направления движения ---
+        double yaw = Math.toRadians(camera.rotation.y);
+        double pitch = Math.toRadians(camera.rotation.x);
 
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) Player.x -= devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) Player.x += devSpeed;
+        // направление взгляда (вектор "вперёд")
+        float dirX = (float) (Math.cos(pitch) * Math.sin(yaw));
+        float dirY = (float) (Math.sin(pitch));
+        float dirZ = (float) (-Math.cos(pitch) * Math.cos(yaw));
 
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) Player.y += devSpeed;
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) Player.y -= devSpeed;
+        // вектор вправо
+        float rightX = (float) Math.sin(yaw - Math.PI / 2.0);
+        float rightZ = (float) -Math.cos(yaw - Math.PI / 2.0);
 
-        if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) Size += ScaleSpeed;
-        if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) Size -= ScaleSpeed;
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+            camera.rotation.y -= rotSpeed * 100;
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            camera.rotation.y += rotSpeed * 100;
+        }
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+            camera.rotation.x += rotSpeed * 100;
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+            camera.rotation.x -= rotSpeed * 100;
+        }
 
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) Player.rotation.add(0.5, 0, 0);
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) Player.rotation.add(-0.5, 0, 0);
+        // --- движение вперёд/назад/влево/вправо ---
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            camera.x += dirX * devSpeed;
+            camera.y += dirY * devSpeed;
+            camera.z += dirZ * devSpeed;
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera.x -= dirX * devSpeed;
+            camera.y -= dirY * devSpeed;
+            camera.z -= dirZ * devSpeed;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera.x += rightX * devSpeed;
+            camera.z += rightZ * devSpeed;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera.x -= rightX * devSpeed;
+            camera.z -= rightZ * devSpeed;
+        }
 
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) Player.rotation.add(0, -0.5, 0);
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) Player.rotation.add(0, 0.5, 0);
+        // --- вверх/вниз ---
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            camera.y += devSpeed;
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            camera.y -= devSpeed;
 
+
+        // --- выход ---
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
     }
 
+
     private void loop() {
+        long lastTime = System.nanoTime();
+        double fpsTimer = 0.0;
+        int frames = 0;
+        int fps = 0;
+
+
         GL.createCapabilities();
 
-        String vertCode =
+        String vertCode ="" +
                 "#version 330 core\n" +
-                        "layout (location = 0) in vec3 aPos;\n" +
-                        "layout (location = 1) in vec3 aColor;\n" +
-                        "out vec3 vertexColor;\n" +
-                        "uniform mat4 projection;\n" +
-                        "uniform mat4 model;\n" +
-                        "void main() {\n" +
-                        "    gl_Position = projection * model * vec4(aPos, 1.0);\n" +
-                        "    vertexColor = aColor;\n" +
-                        "}";
+                "layout (location = 0) in vec3 aPos;\n" +
+                "layout (location = 1) in vec3 aColor;\n" +
+                "out vec3 vertexColor;\n" +
+                "uniform mat4 projection;\n" +
+                "uniform mat4 view;\n" +
+                "uniform mat4 model;\n" +
+                "void main() {\n" +
+                "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n" +
+                "    vertexColor = aColor;\n" +
+                "}\n";
 
         String fragCode =
                 "#version 330 core\n" +
@@ -171,14 +218,30 @@ public class Main {
         glEnable(GL_DEPTH_TEST);
         glClearColor(0f, 0f, 0f, 1f);
 
+
+
+
         objects.add(new GameObject(0f, 0f, -5f, 0.5f, new Vector3d()));
         objects.add(new GameObject(0f, 1f, -5f, 0.5f, new Vector3d()));
         Player = new GameObject(0f, -1f, -5f, 0.5f, new Vector3d());
         objects.add(Player);
-
+        camera = new Camera(0f, 0f, 0f, new Vector3d());
         while (!glfwWindowShouldClose(window)) {
+            long now = System.nanoTime();
+            double deltaTime = (now - lastTime) / 1_000_000_000.0; // секунды
+            lastTime = now;
 
-            processInput(0.02f, 0.01f);
+            fpsTimer += deltaTime;
+            frames++;
+
+            if (fpsTimer >= 1.0) { // каждую секунду
+                fps = frames;
+                frames = 0;
+                fpsTimer = 0.0;
+
+            }
+
+            processInput(0.1f, 0.02f);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -197,6 +260,12 @@ public class Main {
                     (float)width.get(0) / height.get(0),
                     0.1f, 100f
             );
+
+            Matrix4f view = camera.getViewMatrix();
+            FloatBuffer viewBuf = BufferUtils.createFloatBuffer(16);
+            view.get(viewBuf);
+            s.setMatrix4f("view", viewBuf);
+
             FloatBuffer projectionBuf = BufferUtils.createFloatBuffer(16);
             projection.get(projectionBuf);
 

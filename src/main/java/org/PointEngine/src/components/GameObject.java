@@ -1,5 +1,6 @@
-package org.PointEngine;
+package org.PointEngine.src.components;
 
+import org.PointEngine.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.lwjgl.BufferUtils;
