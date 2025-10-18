@@ -27,7 +27,7 @@ public class Main {
     public float Size = 0.33f;
     public GameObject Player;
     public Camera camera;
-
+    public double deltaTime;
 
     List<GameObject> objects = new ArrayList<>();
 
@@ -119,50 +119,49 @@ public class Main {
         float rightZ = (float) -Math.cos(yaw - Math.PI / 2.0);
 
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            camera.rotation.y -= rotSpeed * 100;
+            camera.rotation.y -= (rotSpeed * 100) * (float)deltaTime;
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            camera.rotation.y += rotSpeed * 100;
+            camera.rotation.y += (rotSpeed * 100) * (float)deltaTime;
         }
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-            camera.rotation.x += rotSpeed * 100;
+            camera.rotation.x += (rotSpeed * 100) * (float)deltaTime;
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-            camera.rotation.x -= rotSpeed * 100;
+            camera.rotation.x -= (rotSpeed * 100) * (float)deltaTime;
         }
 
         // --- движение вперёд/назад/влево/вправо ---
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            camera.x += dirX * devSpeed;
-            camera.y += dirY * devSpeed;
-            camera.z += dirZ * devSpeed;
+            camera.x += (dirX * devSpeed) * (float)deltaTime;
+            camera.y += (dirY * devSpeed) * (float)deltaTime;
+            camera.z += (dirZ * devSpeed) * (float)deltaTime;
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            camera.x -= dirX * devSpeed;
-            camera.y -= dirY * devSpeed;
-            camera.z -= dirZ * devSpeed;
+            camera.x -= (dirX * devSpeed) * (float)deltaTime;
+            camera.y -= (dirY * devSpeed) * (float)deltaTime;
+            camera.z -= (dirZ * devSpeed) * (float)deltaTime;
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            camera.x += rightX * devSpeed;
-            camera.z += rightZ * devSpeed;
+            camera.x += (rightX * devSpeed) * (float)deltaTime;
+            camera.z += (rightZ * devSpeed) * (float)deltaTime;
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            camera.x -= rightX * devSpeed;
-            camera.z -= rightZ * devSpeed;
+            camera.x -= (rightX * devSpeed) * (float)deltaTime;
+            camera.z -= (rightZ * devSpeed) * (float)deltaTime;
         }
 
         // --- вверх/вниз ---
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            camera.y += devSpeed;
+            camera.y += devSpeed * (float)deltaTime;
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-            camera.y -= devSpeed;
+            camera.y -= devSpeed * (float)deltaTime;
 
 
         // --- выход ---
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
     }
-
 
     private void loop() {
         long lastTime = System.nanoTime();
@@ -228,7 +227,7 @@ public class Main {
         camera = new Camera(0f, 0f, 0f, new Vector3d());
         while (!glfwWindowShouldClose(window)) {
             long now = System.nanoTime();
-            double deltaTime = (now - lastTime) / 1_000_000_000.0; // секунды
+            deltaTime = (now - lastTime) / 1_000_000_000.0; // секунды
             lastTime = now;
 
             fpsTimer += deltaTime;
@@ -241,7 +240,7 @@ public class Main {
 
             }
 
-            processInput(0.1f, 0.02f);
+            processInput(5f, 1f);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
