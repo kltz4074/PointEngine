@@ -3,8 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "game/game.cpp"
 #include <iostream>
+#include "game/game.cpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/fwd.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -113,9 +115,12 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
     Start();
-
+    int oldTimeSinceStart = 0;
     while (!glfwWindowShouldClose(window))
     {
+        int timeSinceStart = glfwGetTime() * 1000;
+        int deltaTime = timeSinceStart;
+        oldTimeSinceStart = timeSinceStart;
         
         processInput(window);
         Update();
@@ -128,6 +133,11 @@ int main()
         glfwGetFramebufferSize(window, &width, &height);
         // === Матрицы 3D ===
         glm::mat4 model = glm::mat4(1.0f);
+        
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 

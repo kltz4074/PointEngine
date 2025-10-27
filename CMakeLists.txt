@@ -39,5 +39,4 @@ target_link_libraries(PointEngine
         glm
 )
 
-# Для корректного include <glm/glm.hpp>
 target_include_directories(PointEngine PRIVATE ${glm_SOURCE_DIR})
