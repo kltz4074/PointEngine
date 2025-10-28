@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.26.0)
-project(PointEngine VERSION 1.0.0)
-cmake_policy(SET CMP0072 NEW)
+project(PointEngine VERSION 1.0.1)
 
 include(FetchContent)
 
