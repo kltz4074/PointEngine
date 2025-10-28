@@ -19,4 +19,5 @@ inline std::string ReadFileToString(const std::string& filePath) // function to 
     return contents.str();
 }
 
+double deltaTime = 0.0;
 #endif // ENGINE_H

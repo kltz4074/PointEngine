@@ -7,14 +7,15 @@
 #include "GLFW/glfw3.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
-
 #include "game/game.cpp"
 #include "components/GameObject.cpp"
+#include "engine.h"
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
+
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -33,17 +34,8 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
 
-
-class RotatingTriangle : public GameObject {
-public:
-    void Update() override {
-        transform.rotation.y -= 0.05f;
-        transform.rotation.x -= 0.03f;
-    }
-};
-
 int main()
-{
+{   
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -60,6 +52,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0); 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -104,10 +97,60 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    float vertices[] = {
-        -0.5f, -0.5f, -0.5f,
+    float TrinagleVertices[] = {
+        0.0f, -0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,
          0.0f,  0.5f,  0.0f
+    };
+
+    float CubeVertices[] = {
+        // Front face
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+
+        // Back face
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+
+        // Left face
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+
+        // Right face
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+
+        // Top face
+        -0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+
+        // Bottom face
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f, -0.5f
     };
 
     unsigned int VBO, VAO;
@@ -116,7 +159,7 @@ int main()
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(TrinagleVertices), TrinagleVertices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -126,11 +169,29 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
     Start();
+    double oldTimeSinceStart = 0.0; // <-- double, не int
 
-    AddGameObject(new RotatingTriangle());
-    int oldTimeSinceStart = 0;
+    double fpsTimer = 0.0;
+    int frames = 0;
+    int fps = 0;
+    
+    
     while (!glfwWindowShouldClose(window))
     {
+        double now = glfwGetTime(); // <-- тоже double
+        deltaTime = now - oldTimeSinceStart;
+        oldTimeSinceStart = now;
+
+        fpsTimer += deltaTime;
+        frames++;
+
+        if (fpsTimer >= 1.0) {
+            fps = frames;
+            frames = 0;
+            fpsTimer = 0.0;
+            std::cout << "FPS: " << fps << std::endl;
+        }
+
         processInput(window);
         Update();
 
