@@ -1,13 +1,17 @@
-#include <cstdio>
-
+#include <iostream>
+#include "../components/GameObject.cpp"
 void Start() {
-    std::printf("Game Started:3\n");
+    std::cout << "game started :>\n";
+    for (auto obj : sceneObjects) obj->Start();
 }
 
 void Update() {
-
+    for (auto obj : sceneObjects) obj->Update();
 }
 
 void End() {
-    std::printf("Game Ended :<\n");
+    for (auto obj : sceneObjects)
+        delete obj;
+    sceneObjects.clear();
+    std::cout << "game ended :<\n";
 }

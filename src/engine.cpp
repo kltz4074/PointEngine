@@ -4,10 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include "game/game.cpp"
+#include "GLFW/glfw3.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 
+#include "game/game.cpp"
+#include "components/GameObject.cpp"
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -30,6 +32,15 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "{\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
+
+
+class RotatingTriangle : public GameObject {
+public:
+    void Update() override {
+        transform.rotation.y -= 0.05f;
+        transform.rotation.x -= 0.03f;
+    }
+};
 
 int main()
 {
@@ -115,15 +126,14 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
     Start();
+
+    AddGameObject(new RotatingTriangle());
     int oldTimeSinceStart = 0;
     while (!glfwWindowShouldClose(window))
     {
-        int timeSinceStart = glfwGetTime() * 1000;
-        int deltaTime = timeSinceStart;
-        oldTimeSinceStart = timeSinceStart;
-        
         processInput(window);
         Update();
+
         glClearColor(0.027f, 0.0f, 0.341f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -131,28 +141,16 @@ int main()
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-        // === Матрицы 3D ===
-        glm::mat4 model = glm::mat4(1.0f);
-        
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f));
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3));
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
-
-
-        unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
         unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
         unsigned int projLoc = glGetUniformLocation(shaderProgram, "projection");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        DrawAll(shaderProgram, VAO);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -170,6 +168,7 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
