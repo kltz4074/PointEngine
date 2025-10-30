@@ -44,6 +44,7 @@ Benchmarks
 Hardware and measured framerates from early tests (engine is a prototype — numbers vary heavily by scene and driver):
 
 ———————————
+
 OS: Arch Linux  
 CPU: Ryzen 5 5000  
 GPU: integrated  
@@ -178,4 +179,5 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
