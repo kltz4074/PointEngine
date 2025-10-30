@@ -171,10 +171,6 @@ Roadmap
 - [ ] Documentation site (GitHub Pages) and tutorials
 If you want to help shape the roadmap, open an issue or PR.
 
-Contributing
-------------
-Contributions are welcome!!❤️‍🔥❤️‍🔥. 
-
 License
 -------
 PointEngine is released under the MIT License. See the LICENSE file for details.
@@ -182,3 +178,4 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
