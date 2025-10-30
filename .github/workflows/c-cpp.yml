@@ -7,6 +7,13 @@ on:
     branches: [ "master" ]
 
 jobs:
+  installDependecies:
+
+      runs-on: ubuntu-latest
+      steps: 
+        - name: Install dependencies
+          run: sudo apt-get install -y cmake g++ xorg-dev libglu1-mesa-dev pkg-config
+  
   build:
     runs-on: ubuntu-latest
 
@@ -15,6 +22,5 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
-    # Собираем проект
     - name: Build
       run: cmake . && make
