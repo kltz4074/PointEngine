@@ -20,4 +20,4 @@ jobs:
 
     # Собираем проект
     - name: Build
-      run: make
+      run: cmake . && make
