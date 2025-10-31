@@ -3,6 +3,8 @@ build/
 _deps/
 CMakeFiles/
 
+!build/resources/
+!build/resources/**
 
 CMakeDoxygenDefaults.cmake
 build.ninja
