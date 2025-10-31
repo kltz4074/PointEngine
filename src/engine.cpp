@@ -5,10 +5,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "GLFW/glfw3.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/fwd.hpp"
 #include "game/game.cpp"
 #include "components/GameObject.cpp"
 #include "engine.h"
 #include "core/shader.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -16,7 +19,7 @@ const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
 int main()
-{   
+{
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -94,7 +97,6 @@ int main()
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f
     };
 
-
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -122,6 +124,7 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        glUseProgram(shader.ID);
         double now = glfwGetTime(); // <-- тоже double
         deltaTime = now - oldTimeSinceStart;
         oldTimeSinceStart = now;
@@ -145,10 +148,18 @@ int main()
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
 
-        
+
         shader.use();
-        shader.setFloat("someUniform", 1.0f);
-         
+
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+
+        shader.setMat4("model", model);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
+
+        
         DrawAll(shader.ID, VAO);
 
         glBindVertexArray(VAO);
