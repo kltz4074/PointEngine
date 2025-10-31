@@ -4,36 +4,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include "GLFW/glfw3.h"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/fwd.hpp"
+#include "GLFW/glfw3.h" 
 #include "game/game.cpp"
 #include "components/GameObject.cpp"
 #include "engine.h"
-
+#include "core/shader.h"
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
-const char *vertexShaderSource ="#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "uniform mat4 projection;\n"
-    "uniform mat4 view;\n"
-    "uniform mat4 model;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
-    "}\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = ourColor;\n"
-    "}\n\0";
 int main()
 {   
     glfwInit();
@@ -60,112 +41,84 @@ int main()
         return -1;
     }
 
-    // === Шейдеры ===
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "Vertex shader error:\n" << infoLog << std::endl;
-    }
-
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "Fragment shader error:\n" << infoLog << std::endl;
-    }
-
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "Shader linking error:\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
+    Shader ourShader("resources/shaders/shader.vs", "resources/shaders/shader.fs"); // you can name your shader files however you like
     float TrinagleVertices[] = {
         0.0f, -0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,
          0.0f,  0.5f,  0.0f
     };
 
-    float CubeVertices[] = {
-        // Front face
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
+float CubeVertices[] = {
+    // Front face
+    -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, // bottom-left front, красный
+     0.5f, -0.5f,  0.5f,  0.0f, 1.0f, 0.0f, // bottom-right front, зелёный
+     0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // top-right front, синий
+     0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // top-right front, синий
+    -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f, // top-left front, жёлтый
+    -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, // bottom-left front, красный
 
-        // Back face
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
+    // Back face
+    -0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 1.0f, // bottom-left back, пурпурный
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f, // bottom-right back, циан
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, // top-right back, белый
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, // top-right back, белый
+    -0.5f,  0.5f, -0.5f,  0.5f, 0.5f, 0.5f, // top-left back, серый
+    -0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 1.0f, // bottom-left back, пурпурный
 
-        // Left face
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
+    // Left face
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.5f, 0.0f, // top-left front
+    -0.5f,  0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // top-left back
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.5f, 1.0f, // bottom-left back
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.5f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.5f, // bottom-left front
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.5f, 0.0f,
 
-        // Right face
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
+    // Right face
+     0.5f,  0.5f,  0.5f,  0.5f, 0.0f, 1.0f, // top-right front
+     0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.5f, // top-right back
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.5f, // bottom-right back
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.5f,
+     0.5f, -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, // bottom-right front
+     0.5f,  0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
 
-        // Top face
-        -0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-         0.5f,  0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
+    // Top face
+    -0.5f,  0.5f, -0.5f,  1.0f, 0.5f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.5f, 1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.5f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.5f,
+    -0.5f,  0.5f,  0.5f,  0.5f, 0.5f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 0.5f, 1.0f,
 
-        // Bottom face
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f
-    };
+    // Bottom face
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.3f, 0.3f, 0.3f,
+     0.5f, -0.5f,  0.5f,  0.6f, 0.6f, 0.6f,
+     0.5f, -0.5f,  0.5f,  0.6f, 0.6f, 0.6f,
+    -0.5f, -0.5f,  0.5f,  0.9f, 0.9f, 0.9f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f
+};
+
+
 
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices), CubeVertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    // glBindVertexArray(0);
 
     glEnable(GL_DEPTH_TEST);
     Start();
@@ -175,59 +128,45 @@ int main()
     int frames = 0;
     int fps = 0;
 
+    GameObject* cube = new GameObject("Cube");
+    cube->VAO = VAO;
+    cube->vertexCount = 36;
+    AddGameObject(cube);
     while (!glfwWindowShouldClose(window))
     {
-        double now = glfwGetTime(); // <-- тоже double
-        deltaTime = now - oldTimeSinceStart;
-        oldTimeSinceStart = now;
+    double now = glfwGetTime();
+    deltaTime = now - oldTimeSinceStart;
+    oldTimeSinceStart = now;
 
-        fpsTimer += deltaTime;
-        frames++;
+    processInput(window);
+    UpdateAll();
 
-        if (fpsTimer >= 1.0) {
-            fps = frames;
-            frames = 0;
-            fpsTimer = 0.0;
-            std::cout << "FPS: " << fps << std::endl;
-        }
+    glClearColor(0.027f, 0.0f, 0.341f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        processInput(window);
-        Update();
+    // после создания шейдера
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH/HEIGHT, 0.1f, 100.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(1.5f,1.5f,3.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f));
 
-        glClearColor(0.027f, 0.0f, 0.341f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // перед циклом рендеринга
+    unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+    unsigned int projLoc = glGetUniformLocation(ourShader.ID, "projection");
 
-        glUseProgram(shaderProgram);
+    ourShader.use();
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    DrawAll(ourShader.ID);
 
-        double  timeValue = glfwGetTime();
-        float greenValue = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
-
-        unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-        unsigned int projLoc = glGetUniformLocation(shaderProgram, "projection");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
-
-        DrawAll(shaderProgram, VAO);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+        
     }
     End();
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(ourShader.ID);
 
     glfwTerminate();
     return 0;
