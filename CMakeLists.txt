@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26.0)
-project(PointEngine VERSION 1.0.1)
+project(PointEngine)
 
 include(FetchContent)
 

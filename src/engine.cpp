@@ -10,6 +10,7 @@
 #include "game/game.cpp"
 #include "components/GameObject.cpp"
 #include "engine.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
@@ -158,7 +159,7 @@ int main()
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(TrinagleVertices), TrinagleVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices), CubeVertices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -173,8 +174,7 @@ int main()
     double fpsTimer = 0.0;
     int frames = 0;
     int fps = 0;
-    
-    
+
     while (!glfwWindowShouldClose(window))
     {
         double now = glfwGetTime(); // <-- тоже double
@@ -216,6 +216,10 @@ int main()
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
         DrawAll(shaderProgram, VAO);
+
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
