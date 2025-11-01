@@ -24,6 +24,7 @@ find_package(OpenGL REQUIRED)
 add_executable(PointEngine 
     src/engine.cpp
     src/glad.c
+    src/core/stb_image.cpp
 )
 
 target_include_directories(PointEngine 

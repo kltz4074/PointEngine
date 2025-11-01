@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <vector>
 #include <string>
+#include "../core/stb_image.h"
 struct Transform {
     glm::vec3 position;
     glm::vec3 rotation;
