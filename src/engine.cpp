@@ -156,6 +156,7 @@ int main()
     int fps = 0;
     
     unsigned int texture;
+    double now;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -179,8 +180,8 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        glUseProgram(shader.ID);
-        double now = glfwGetTime(); // <-- тоже double
+
+        now = glfwGetTime();
         deltaTime = now - oldTimeSinceStart;
         oldTimeSinceStart = now;
 
@@ -192,10 +193,10 @@ int main()
             frames = 0;
             fpsTimer = 0.0;
             std::cout << "FPS: " << fps << std::endl;
-        }
+        } 
 
-        processInput(window);
-        Update();
+        processInput(window); // input
+        Update(); 
 
         glClearColor(0.027f, 0.0f, 0.341f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -208,11 +209,10 @@ int main()
         shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glm::mat4 model = glm::mat4(1.0f);
+
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3));
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
-        shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 

@@ -6,15 +6,16 @@ bool CanUp = false;
 
 class RotatingTriangle : public GameObject {
 public:
+    float speed = 1.0f; // скорость движения (единица в секунду)
+    float rotSpeed = 1.0f; // градусов в секунду
+    
     void Start() override {
         transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
         transform.rotation = glm::vec3(0.0f);
     }
 
-    void Update() override {
-        float speed = 1.0f; // скорость движения (единица в секунду)
-        float rotSpeed = 1.0f; // градусов в секунду
 
+    void Update() override {
         if (CanUp)
             transform.position.y += speed * deltaTime;
         else
