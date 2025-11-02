@@ -48,7 +48,7 @@ Hardware and measured framerates from early tests (engine is a prototype — num
 OS: Arch Linux  
 CPU: Ryzen 5 5000  
 GPU: integrated  
-RAM: 32 GB DDR5  
+RAM: 16gb ddr4
 FPS: 4k - 11k
 
 ———————————
@@ -56,7 +56,7 @@ FPS: 4k - 11k
 OS: Windows  
 CPU: i7-13620H  
 GPU: RTX 4060 (laptop)  
-RAM: 16 GB DDR4  
+RAM: 32 GB DDR5  
 FPS: 6k - 10k
 
 ———————————
@@ -179,6 +179,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
