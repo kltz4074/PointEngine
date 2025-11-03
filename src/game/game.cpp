@@ -1,47 +1,34 @@
 #include <iostream>
 #include "../components/GameObject.cpp"
+#include "../components/Mesh.cpp"
+#include "../components/Camera.cpp"
 #include "../engine.h"
+#include "glm/fwd.hpp"
 
 bool CanUp = false;
 
-class Cube : public GameObject {
-public:
-    float speed = 1.0f; // скорость движения (единица в секунду)
-    float rotSpeed = 1.0f; // градусов в секунду
-    
-    void Start() override {
-        transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
-        transform.rotation = glm::vec3(0.0f);
-    }
 
-
-    void Update() override {
-        if (CanUp)
-            transform.position.y += speed * deltaTime;
-        else
-            transform.position.y -= speed * deltaTime;
-
-        if (transform.position.y >= 0.5f)
-            CanUp = false;
-        if (transform.position.y <= -0.5f)
-            CanUp = true;
-
-        transform.rotation.y += rotSpeed * deltaTime;
-        transform.rotation.z += rotSpeed * deltaTime;
-    }
-};
-
+Mesh* cube = new Mesh;
 
 void Start() {
     std::cout << "game started :>\n";
     for (auto obj : sceneObjects) obj->Start();
-    AddGameObject(new Cube());
+    Camera* camera = new Camera;
+
+    camera->transform.position = glm::vec3(0, 0, 0);
+    
+    cube->material.texturePath = "resources/Textures/wall.jpg";
+    cube->material.LoadTexture();
+    cube->transform.position = glm::vec3(0, 0, 0);
+
+    AddGameObject(cube);
     
 }
 
 void Update() {
     for (auto obj : sceneObjects) obj->Update();
-
+    cube->transform.rotation.y += 1.0f * deltaTime;
+    cube->transform.rotation.z += 1.0f * deltaTime;
 }
 
 void End() {

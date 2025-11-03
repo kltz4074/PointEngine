@@ -23,9 +23,6 @@ struct Transform {
         return model;
     }
 };
-struct Material {
-
-};
 class GameObject {
 public:
     std::string name;
