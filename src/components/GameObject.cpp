@@ -23,7 +23,9 @@ struct Transform {
         return model;
     }
 };
+struct Material {
 
+};
 class GameObject {
 public:
     std::string name;
@@ -45,7 +47,6 @@ public:
     }
 };
 
-// === Глобальная сцена ===
 std::vector<GameObject*> sceneObjects;
 
 void AddGameObject(GameObject* obj) {
@@ -55,4 +56,10 @@ void AddGameObject(GameObject* obj) {
 void DrawAll(unsigned int shaderProgram, unsigned int VAO) {
     for (auto obj : sceneObjects)
         obj->Draw(shaderProgram, VAO);
+}
+
+// cool stuff
+void RemoveObjs() {
+    for (auto obj : sceneObjects)
+        delete obj;
 }

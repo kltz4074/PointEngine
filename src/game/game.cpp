@@ -4,7 +4,7 @@
 
 bool CanUp = false;
 
-class RotatingTriangle : public GameObject {
+class Cube : public GameObject {
 public:
     float speed = 1.0f; // скорость движения (единица в секунду)
     float rotSpeed = 1.0f; // градусов в секунду
@@ -35,7 +35,7 @@ public:
 void Start() {
     std::cout << "game started :>\n";
     for (auto obj : sceneObjects) obj->Start();
-    AddGameObject(new RotatingTriangle());
+    AddGameObject(new Cube());
     
 }
 
@@ -45,8 +45,7 @@ void Update() {
 }
 
 void End() {
-    for (auto obj : sceneObjects)
-        delete obj;
+    RemoveObjs();
     sceneObjects.clear();
     std::cout << "game ended :<\n";
 }
