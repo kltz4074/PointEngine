@@ -101,9 +101,6 @@ Quick build (typical)
 3. Run the built binary (path will depend on platform/build):
    ./PointEngine        # or PointEngine.exe on Windows
 
-Notes
-- all needed libraries is in "include" folder ;)
-
 Example usage
 -------------
 At this stage, the engine exposes an internal API (C++) for scene creation, rendering, and simple systems. A minimal pseudocode flow (future Python binding planned):
@@ -182,6 +179,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
