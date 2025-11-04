@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -5,7 +6,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "GLFW/glfw3.h"
-#include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 #include "game/game.cpp"
 #include "components/GameObject.cpp"
@@ -19,7 +19,7 @@ void processInput(GLFWwindow *window);
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
-glm::vec3 CamPos = {0, 0, -3.0f};
+glm::mat4 camPos;
 
 int main()
 {
@@ -30,8 +30,13 @@ int main()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "PointEngine", NULL, NULL);
+    GLFWimage PointIcon[1];
+    PointIcon[0].pixels = stbi_load("resources/Icon.png", &PointIcon[0].width, &PointIcon[0].height, 0, 4);
+    glfwSetWindowIcon(window, 1, PointIcon);
+    stbi_image_free(PointIcon[0].pixels);
+
+    
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -47,7 +52,6 @@ int main()
         return -1;
     }
 
-    
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
 
     unsigned int VBO, VAO, EBO;
@@ -109,7 +113,7 @@ int main()
             std::cout << "FPS: " << fps << std::endl;
         } 
 
-        processInput(window); // input
+        ProcessInput(window); // input
         Update(); 
 
         glClearColor(0.027f, 0.0f, 0.341f, 1.0f);
@@ -124,7 +128,7 @@ int main()
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), CamPos);
+        glm::mat4 view = UserCum->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
         shader.setMat4("view", view);
@@ -149,13 +153,6 @@ int main()
 
     glfwTerminate();
     return 0;
-}
-
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

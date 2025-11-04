@@ -40,7 +40,7 @@ public:
         glm::mat4 model = transform.GetMatrix();
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
         glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, model.length() * 10);
     }
 };
 
