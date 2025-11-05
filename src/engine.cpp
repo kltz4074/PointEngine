@@ -112,7 +112,7 @@ int main()
             fpsTimer = 0.0;
             std::cout << "FPS: " << fps << std::endl;
         } 
-
+        glfwSetCursorPosCallback(window, mouse_callback);
         ProcessInput(window); // input
         Update(); 
 
