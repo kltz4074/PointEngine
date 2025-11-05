@@ -50,9 +50,16 @@ void End() {
 }
 
 void ProcessInput(GLFWwindow* window) {
-    float speed = 5.0f * deltaTime;
+    float BasicSpeed = 5.0 * deltaTime;
+    float RunningSpeed = 10.0f * deltaTime;
+    float currentSpeed;
     float rotSpeed = 80.0f * deltaTime;
 
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        currentSpeed = RunningSpeed;
+    } else {
+        currentSpeed = BasicSpeed;
+    }
     // --- вращение камеры ---
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         UserCum->transform.rotation.y -= rotSpeed;
@@ -75,18 +82,18 @@ void ProcessInput(GLFWwindow* window) {
 
     // --- движение камеры ---
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        UserCum->transform.position += forward * speed;
+        UserCum->transform.position += forward * currentSpeed;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        UserCum->transform.position -= forward * speed;
+        UserCum->transform.position -= forward * currentSpeed;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        UserCum->transform.position -= right * speed;
+        UserCum->transform.position -= right * currentSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        UserCum->transform.position += right * speed;
+        UserCum->transform.position += right * currentSpeed;
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        UserCum->transform.position += up * speed;
+        UserCum->transform.position += up * currentSpeed;
     
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-        UserCum->transform.position -= up * speed; 
+        UserCum->transform.position -= up * currentSpeed; 
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        UserCum->transform.position += up * speed;
+        UserCum->transform.position += up * currentSpeed;
 }
