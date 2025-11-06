@@ -14,7 +14,7 @@ bool firstMouse = true;
 
 Mesh* cube = new Mesh;
 Mesh* cube2 = new Mesh;
-PointLight* pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 1.0f);
+PointLight* pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 100.0f);
 Camera* UserCum = new Camera;
 std::string wallTexture = "resources/Textures/container.jpg";
 
