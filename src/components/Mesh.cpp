@@ -18,6 +18,8 @@ struct Material {
     }
 public:
     std::string texturePath;
+    
+    float shininess;
 };
 
 class Mesh : public GameObject {

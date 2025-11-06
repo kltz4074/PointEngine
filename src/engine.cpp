@@ -44,7 +44,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); 
+    glfwSwapInterval(0); 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -67,13 +67,15 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(CubeIndices), CubeIndices, GL_STATIC_DRAW);
 
-    // position attribute
+    // 0: position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // color attribute
+
+    // 1: normal
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // texture coord attribute
+
+    // 2: uv
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
@@ -123,14 +125,21 @@ int main()
         glfwGetFramebufferSize(window, &width, &height);
 
         glBindTexture(GL_TEXTURE_2D, texture);
-
-        shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glm::mat4 view = UserCum->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, UserCum->transform.position);
+        model = glm::rotate(model, glm::radians(UserCum->transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(UserCum->transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::scale(model, UserCum->transform.scale);
 
+        shader.use();        
+        shader.setVec3("lightPos", pointLight->transform.position);
+        shader.setVec3("viewPos", UserCum->transform.position);
+        shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 

@@ -7,14 +7,14 @@
 #include "glm/fwd.hpp"
 #include "glm/trigonometric.hpp"
 #include <GLFW/glfw3.h>
+#include "../components/Light/PointLight.cpp"
 
 bool CanUp = false;
 bool firstMouse = true;
 
 Mesh* cube = new Mesh;
 Mesh* cube2 = new Mesh;
-Mesh* cube3 = new Mesh;
-
+PointLight* pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 1.0f);
 Camera* UserCum = new Camera;
 std::string wallTexture = "resources/Textures/container.jpg";
 
@@ -30,9 +30,10 @@ void Start() {
     std::cout << "game started :>\n";
     for (auto obj : sceneObjects) obj->Start();
 
+    
     UserCum->transform.position = {0, 0, 3};
     UserCum->transform.rotation = {0, 0, 0};
-
+    pointLight->transform.position = {0, 0, 0};
     cube->transform.position = {1, 0, 0};
     cube->material.texturePath = wallTexture;
 
