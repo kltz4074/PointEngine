@@ -2,7 +2,7 @@ build/*
 .cache/
 _deps/
 CMakeFiles/
-
+ptng/
 CMakeDoxygenDefaults.cmake
 build.ninja
 cmake_install.cmake
