@@ -79,5 +79,9 @@ const unsigned int CubeIndices[] = {
     32, 34, 35
 };
 
+// Size constants
+const size_t CubeVerticesSize = sizeof(CubeVertices) / sizeof(CubeVertices[0]);
+const size_t CubeIndicesSize = sizeof(CubeIndices) / sizeof(CubeIndices[0]);
+
 } // namespace PointEngine
 

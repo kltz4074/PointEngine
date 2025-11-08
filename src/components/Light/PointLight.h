@@ -11,8 +11,7 @@ public:
     glm::vec3 color;
     float intensity;
     
-    PointLight(glm::vec3 col, float intens)
-        : color(col), intensity(intens) {}
+    PointLight(glm::vec3 col, float intens);
 };
 
 } // namespace PointEngine
