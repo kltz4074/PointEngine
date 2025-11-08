@@ -1,5 +1,5 @@
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef POINTENGINE_CUBE_H
+#define POINTENGINE_CUBE_H
 
 namespace PointEngine {
 
@@ -8,4 +8,5 @@ extern const unsigned int CubeIndices[];
 
 } // namespace PointEngine
 
-#endif // CUBE_H
+#endif // POINTENGINE_CUBE_H
+
