@@ -83,10 +83,10 @@ int main()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices), CubeVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, CubeVerticesSize * sizeof(float), CubeVertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(CubeIndices), CubeIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, CubeIndicesSize * sizeof(unsigned int), CubeIndices, GL_STATIC_DRAW);
 
     // 0: position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -163,7 +163,7 @@ int main()
         shader.use();        
         shader.setVec3("lightPos", pointLight->transform.position);
         shader.setVec3("lightColor", pointLight->color);
-        shader.setVec3("viewPos", UserCum->transform.position);
+        shader.setVec3("viewPos", userCamera->transform.position);
         shader.setMat4("model", model);
         shader.setMat4("view", viewMatrix);
         shader.setMat4("projection", projection);
