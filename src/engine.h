@@ -1,13 +1,19 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <string>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <iostream>
 
-inline std::string ReadFileToString(const std::string& filePath) // function to read a file
-{
+namespace PointEngine {
+
+/**
+ * @brief utility function to read a file into a string
+ * @param filePath path to the file to read
+ * @return contents of the file as a string, or empty string on error
+ */
+inline std::string ReadFileToString(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::in | std::ios::binary);
     if (!file) {
         std::cerr << "Could not open the file - '" << filePath << "'\n";
@@ -19,5 +25,18 @@ inline std::string ReadFileToString(const std::string& filePath) // function to 
     return contents.str();
 }
 
-double deltaTime = 0.0;
+/**
+ * @brief get the current delta time (time since last frame)
+ * @return delta time in seconds
+ */
+double GetDeltaTime();
+
+/**
+ * @brief set the delta time (internal use only (as i understand))
+ * @param dt delta time in seconds
+ */
+void SetDeltaTime(double dt);
+
+} // namespace PointEngine
+
 #endif // ENGINE_H

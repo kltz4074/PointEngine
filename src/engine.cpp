@@ -6,21 +6,41 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include "GLFW/glfw3.h"
-#include "glm/fwd.hpp"
-#include "game/game.cpp"
-#include "components/GameObject.cpp"
+#include <fstream>
+#include <sstream>
+
 #include "engine.h"
 #include "core/shader.h"
+#include "core/stb_image.h"
+#include "components/GameObject.h"
+#include "components/Camera.h"
+#include "components/Mesh.h"
+#include "components/Light/PointLight.h"
 #include "components/Meshes/Cube.h"
+#include "game/game.h"
 
+using namespace PointEngine;
+
+// Internal engine state
+namespace {
+    double g_deltaTime = 0.0;
+    const unsigned int WIDTH = 800;
+    const unsigned int HEIGHT = 600;
+}
+
+// Forward declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
 
-const unsigned int WIDTH = 800;
-const unsigned int HEIGHT = 600;
-
-glm::mat4 camPos;
+// Public API implementation
+namespace PointEngine {
+    double GetDeltaTime() {
+        return g_deltaTime;
+    }
+    
+    void SetDeltaTime(double dt) {
+        g_deltaTime = dt;
+    }
+}
 
 int main()
 {
@@ -82,7 +102,7 @@ int main()
 
 
     glEnable(GL_DEPTH_TEST);
-    double oldTimeSinceStart = 0.0; // <-- double, не int
+    double oldTimeSinceStart = 0.0;
 
     double fpsTimer = 0.0;
     int frames = 0;
@@ -103,10 +123,10 @@ int main()
     {
 
         now = glfwGetTime();
-        deltaTime = now - oldTimeSinceStart;
+        SetDeltaTime(now - oldTimeSinceStart);
         oldTimeSinceStart = now;
 
-        fpsTimer += deltaTime;
+        fpsTimer += GetDeltaTime();
         frames++;
 
         if (fpsTimer >= 1.0) {
@@ -129,20 +149,23 @@ int main()
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        glm::mat4 view = UserCum->GetViewMatrix();
+        Camera* userCamera = GetUserCamera();
+        PointLight* pointLight = GetPointLight();
+        
+        glm::mat4 viewMatrix = userCamera->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
-        glm::mat4 model = glm::mat4(10.0f);
-        model = glm::translate(model, UserCum->transform.position);
-        model = glm::rotate(model, glm::radians(UserCum->transform.rotation.x), glm::vec3(1, 0, 0));
-        model = glm::rotate(model, glm::radians(UserCum->transform.rotation.y), glm::vec3(0, 1, 0));
-        model = glm::scale(model, UserCum->transform.scale);
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, userCamera->transform.position);
+        model = glm::rotate(model, glm::radians(userCamera->transform.rotation.x), glm::vec3(1, 0, 0));
+        model = glm::rotate(model, glm::radians(userCamera->transform.rotation.y), glm::vec3(0, 1, 0));
+        model = glm::scale(model, userCamera->transform.scale);
 
         shader.use();        
         shader.setVec3("lightPos", pointLight->transform.position);
         shader.setVec3("lightColor", pointLight->color);
         shader.setVec3("viewPos", UserCum->transform.position);
         shader.setMat4("model", model);
-        shader.setMat4("view", view);
+        shader.setMat4("view", viewMatrix);
         shader.setMat4("projection", projection);
         shader.setFloat("lightIntensity", pointLight->intensity);
         

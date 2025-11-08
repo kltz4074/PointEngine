@@ -1,4 +1,4 @@
-#include "GameObject.cpp"
+#include "Mesh.h"
 #include <iostream>
 #include "../core/shader.h"
 struct Material {
@@ -35,7 +35,4 @@ public:
     float shininess;
 };
 
-class Mesh : public GameObject {
-public:
-    Material material;
-};
+} // namespace PointEngine
