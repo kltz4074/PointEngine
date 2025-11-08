@@ -32,7 +32,7 @@ namespace PointEngine {
         // Initialize game objects
         cube = new Mesh;
         cube2 = new Mesh;
-        pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 100.0f);
+        pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 1.0f);
         userCamera = new Camera;
         
         userCamera->transform.position = {0, 0, 3};
