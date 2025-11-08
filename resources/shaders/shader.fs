@@ -12,7 +12,9 @@ uniform vec3 viewPos;
 
 // Новые юниформы для цветов и силы
 uniform vec3 lightColor = vec3(1.0, 1.0, 1.0);   // белый свет
+uniform float lightIntensity = 1.0;               // light intensity
 uniform float ambientStrength = 0.2;             // 20% ambient (настраивай под себя)
+
 
 void main()
 {
@@ -33,7 +35,9 @@ void main()
 
     // --- Итоговый цвет ---
     vec3 objectColor = texture(texture_diffuse, TexCoord).rgb;
-    vec3 result = (ambient + diffuse + specular) * objectColor;
+
+    // применяем яркость
+    vec3 result = lightIntensity * (ambient + diffuse + specular) * objectColor;
 
     FragColor = vec4(result, 1.0);
 }

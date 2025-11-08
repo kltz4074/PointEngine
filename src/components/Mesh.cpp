@@ -1,6 +1,6 @@
 #include "GameObject.cpp"
 #include <iostream>
-
+#include "../core/shader.h"
 struct Material {
     void LoadTexture() {
         int width, height, nrChannels;
@@ -16,9 +16,22 @@ struct Material {
         }
         stbi_image_free(data);
     }
+
+    void ApplyShader(Shader* shader) {
+        shader->use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, MaterialShader->ID);
+        shader->setVec3("material.ambient", ambient);
+        shader->setVec3("material.diffuse", diffuse);
+        shader->setVec3("material.specular", specular);
+        shader->setFloat("material.shininess", shininess);
+    }
 public:
     std::string texturePath;
-    
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    Shader* MaterialShader;
     float shininess;
 };
 

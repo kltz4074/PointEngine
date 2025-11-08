@@ -1,3 +1,4 @@
+
 #include <cstddef>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -138,11 +139,12 @@ int main()
 
         shader.use();        
         shader.setVec3("lightPos", pointLight->transform.position);
+        shader.setVec3("lightColor", pointLight->color);
         shader.setVec3("viewPos", UserCum->transform.position);
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-
+        shader.setFloat("lightIntensity", pointLight->intensity);
         
         DrawAll(shader.ID, VAO);
 

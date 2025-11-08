@@ -14,27 +14,28 @@ bool firstMouse = true;
 
 Mesh* cube = new Mesh;
 Mesh* cube2 = new Mesh;
-PointLight* pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 100.0f);
+PointLight* pointLight = new PointLight({0.2f, 0.0f, 1.0f}, 1.0f);
+Mesh* lightMesh = new Mesh;
 Camera* UserCum = new Camera;
 std::string wallTexture = "resources/Textures/container.jpg";
 
-float lastX = 400.0f;
-float lastY = 300.0f;
-float yaw   = -90.0f; // чтобы смотреть вперёд, а не вправо
-float pitch = 0.0f;
 const float sensitivity = 0.1f;
-bool CursordEnabeled;
+bool CursordEnabeled = true;
 glm::vec3 forward;
 
 void Start() {
     std::cout << "game started :>\n";
     for (auto obj : sceneObjects) obj->Start();
 
-    
     UserCum->transform.position = {0, 0, 3};
     UserCum->transform.rotation = {0, 0, 0};
     pointLight->transform.position = {0, 0, 0};
-    cube->transform.position = {1, 0, 0};
+    lightMesh->transform.position = pointLight->transform.position;
+    lightMesh->transform.scale = {0.2f, 0.2f, 0.2f};
+    lightMesh->material.MaterialShader = new Shader("./resources/shaders/Mesh/Cube/shader.vs", "./resources/shaders/Mesh/Cube/shader.fs");
+    
+
+    cube->transform.position = {1, 0, 0};    
     cube->material.texturePath = wallTexture;
 
     cube2->transform.position = {0, -2, 0};
@@ -42,9 +43,11 @@ void Start() {
     cube2->transform.scale.z = 20;
     cube2->material.texturePath = wallTexture;
 
+
     cube->material.LoadTexture();
     cube2->material.LoadTexture();
 
+    AddGameObject(lightMesh);
     AddGameObject(cube);
     AddGameObject(cube2);
 
@@ -60,10 +63,15 @@ void Update() {
 
 void End() {
     RemoveObjs();
+    
     sceneObjects.clear();
     std::cout << "game ended :<\n";
 }
 
+float lastX = 400.0f;
+float lastY = 300.0f;
+float yaw   = -90.0f; // чтобы смотреть вперёд, а не вправо
+float pitch = 0.0f;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     float x = static_cast<float>(xpos);
@@ -124,11 +132,16 @@ void ProcessInput(GLFWwindow* window) {
     static bool escPressedLastFrame = false;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        if (!escPressedLastFrame) { // сработает только один раз на нажатие
+        if (!escPressedLastFrame) {
             CursordEnabeled = !CursordEnabeled;
-            glfwSetInputMode(window, GLFW_CURSOR, 
-                CursordEnabeled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+            if (CursordEnabeled) {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                firstMouse = true; // чтобы избежать резкого скачка при повторном захвате курсора
+            } else {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
         }
+        
         escPressedLastFrame = true;
     } else {
         escPressedLastFrame = false;
