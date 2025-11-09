@@ -1,4 +1,5 @@
 #include "game.h"
+#include "engine.h"
 #include <iostream>
 #include <string>
 #include <glm/glm.hpp>
@@ -31,7 +32,7 @@ namespace PointEngine {
         // Initialize game objects
         cube = new Mesh;
         cube2 = new Mesh;
-        pointLight = new PointLight({0.5f, 1.0f, 1.0f}, 1.0f);
+        pointLight = new PointLight(PointEngine::convertColor255To1({255, 0, 0}), 1.0f);
         userCamera = new Camera;
         
         userCamera->transform.position = {0, 0, 3};
