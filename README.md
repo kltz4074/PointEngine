@@ -27,12 +27,12 @@ Contents
 
 About
 -----
-PointEngine is planned to be 
+PointEngine is planned to have:
 
--- Photorealistic light
--- Realistic physics
--- Flexible component system (like Unity)
--- easy game coding
+- Photorealistic light
+- Realistic physics
+- Flexible component system (like Unity)
+- easy game coding
 
 ----------
 Hardware and measured framerates from early tests (engine is a prototype — numbers vary heavily by scene and driver):
@@ -276,6 +276,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
