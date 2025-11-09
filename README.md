@@ -27,19 +27,13 @@ Contents
 
 About
 -----
-PointEngine focuses on fast 3D rendering and general systems that are useful for simulations (chemical reactions, particle systems) and games. It is intended to be cross-platform and simple to build using CMake.
+PointEngine is planned to be 
 
-Features
---------
-Right now PointEngine is in its early stages. Planned and core characteristics:
+-- Photorealistic light
+-- Realistic physics
+-- Flexible component system (like Unity)
+-- easy game coding
 
-- Minimal, modern C++ core (early prototype)
-- Rendering backend: OpenGL
-- Cross-platform: tested on Windows, macOS, Arch Linux
-- Designed with simulation-focused workloads in mind (chemical reactions, particles)
-- Future: Python scripting for game/simulation logic, more physics & GPU compute support
-
-Benchmarks
 ----------
 Hardware and measured framerates from early tests (engine is a prototype — numbers vary heavily by scene and driver):
 
@@ -72,11 +66,7 @@ Releases & Demo
 ---------------
 Prebuilt engine releases and demo games are available in the repository Releases tab. Demo video:
 
-
-
 https://github.com/user-attachments/assets/4fe129e2-63c0-4b59-863f-967722da47e7
-
-
 
 Getting started
 ---------------
@@ -86,20 +76,23 @@ Requirements
 - OpenGL development headers / drivers
 - Platform-specific dev packages (GLFW/SDL2, GLM, etc. — see repository CMakeLists for exact deps)
 
-Quick build (typical)
-1. Clone the repo:
-   git clone https://github.com/kltz4074/PointEngine.git
-   cd PointEngine
+build variants
+   - git clone https://github.com/kltz4074/PointEngine
+   - cd PointEngine
+   - mkdir build
+   - cd build
+   - cmake ..
+   - cmake --build . --config Release
+   - cd ..
+   - start build/PointEngine.exe
 
-2. Create build dir and run CMake:
-   mkdir build
-   cd build
-   cmake ..
-   cmake --build . --config Release
-
-3. Run the built binary (path will depend on platform/build):
-   ./PointEngine        # or PointEngine.exe on Windows
-
+Linux / MacOS:
+   - git clone https://github.com/kltz4074/PointEngine
+   - cd PointEngine
+   - cmake .
+   - make
+   - ./PointEngine
+   
 Example usage
 -------------
 At this stage, the engine exposes an internal API (C++) for scene creation, rendering, and simple systems. A minimal pseudocode flow (future Python binding planned):
@@ -269,9 +262,9 @@ Roadmap
 -------
 (early — will be expanded)
 - [x] Stabilize C++ core and public API
-- [ ] Add Python scripting binding for game/simulation logic
+- [ ] Photorealistic light system
+- [ ] Add Python scripting binding for game logic
 - [ ] Add physics integration and basic particle/chemical reaction modules
-- [ ] GPU-accelerated compute for large-scale simulations
 - [ ] Editor (PointEngineEditor) for scene building and asset management
 - [ ] Documentation site (GitHub Pages) and tutorials
 If you want to help shape the roadmap, open an issue or PR.
@@ -283,6 +276,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
