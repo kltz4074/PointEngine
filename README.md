@@ -74,7 +74,6 @@ Requirements
 - C++17 (or newer) compiler
 - CMake 3.26+ (or newer)
 - OpenGL development headers / drivers
-- Platform-specific dev packages (GLFW/SDL2, GLM, etc. — see repository CMakeLists for exact deps)
 
 build variants
    - git clone https://github.com/kltz4074/PointEngine
@@ -276,6 +275,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
