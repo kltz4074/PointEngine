@@ -29,6 +29,10 @@ inline std::string ReadFileToString(const std::string& filePath) {
 inline glm::vec3 convertColor255To1(const glm::vec3 color) {
     return glm::vec3(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f);
 };
+
+inline glm::vec3 convertColor1To255(const glm::vec3 color) {
+    return glm::vec3(color.r * 255.0f, color.g * 255.0f, color.b * 255.0f);
+};
 /**
  * @brief get the current delta time (time since last frame)
  * @return delta time in seconds

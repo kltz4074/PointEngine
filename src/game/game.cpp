@@ -22,7 +22,7 @@ namespace {
     Mesh* cube2 = nullptr;
     PointLight* pointLight = nullptr;
     Camera* userCamera = nullptr;
-    std::string wallTexture = "resources/Textures/container.jpg";
+    std::string wallTexture = "resources/Textures/container.jpg"; // big engine optimization
 }
 
 namespace PointEngine {
@@ -32,7 +32,7 @@ namespace PointEngine {
         // Initialize game objects
         cube = new Mesh;
         cube2 = new Mesh;
-        pointLight = new PointLight(PointEngine::convertColor255To1({255, 0, 0}), 1.0f);
+        pointLight = new PointLight(PointEngine::convertColor255To1({255, 255, 255}), 1.0f);
         userCamera = new Camera;
         
         userCamera->transform.position = {0, 0, 3};
