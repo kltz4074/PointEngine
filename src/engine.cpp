@@ -6,15 +6,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include <fstream>
-#include <sstream>
-
 #include "engine.h"
 #include "core/shader.h"
 #include "core/stb_image.h"
 #include "components/GameObject.h"
 #include "components/Camera.h"
-#include "components/Mesh.h"
 #include "components/Light/PointLight.h"
 #include "components/Meshes/Cube.h"
 #include "game/game.h"
@@ -26,6 +22,7 @@ namespace {
     double g_deltaTime = 0.0;
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
+    bool VsyncEnabled = false;
 }
 
 // Forward declarations
@@ -65,7 +62,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(0); 
+    glfwSwapInterval(VsyncEnabled ? 1 : 0); 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {

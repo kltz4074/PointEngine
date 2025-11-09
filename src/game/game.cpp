@@ -1,7 +1,6 @@
 #include "game.h"
 #include <iostream>
 #include <string>
-#include <vector>
 #include <glm/glm.hpp>
 #include <glm/trigonometric.hpp>
 
@@ -15,7 +14,7 @@ namespace {
     float yaw = -90.0f; // чтобы смотреть вперёд, а не вправо
     float pitch = 0.0f;
     const float sensitivity = 0.1f;
-    bool CursorEnabled = false;
+    bool CursorEnabled = true;
     glm::vec3 forward;
     
     Mesh* cube = nullptr;
@@ -32,7 +31,7 @@ namespace PointEngine {
         // Initialize game objects
         cube = new Mesh;
         cube2 = new Mesh;
-        pointLight = new PointLight({1.0f, 1.0f, 1.0f}, 1.0f);
+        pointLight = new PointLight({0.5f, 1.0f, 1.0f}, 1.0f);
         userCamera = new Camera;
         
         userCamera->transform.position = {0, 0, 3};
@@ -140,6 +139,7 @@ namespace PointEngine {
                 glfwSetInputMode(window, GLFW_CURSOR, 
                     CursorEnabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
             }
+            firstMouse = true; // чтобы избежать резкого скачка при повторном захвате курсора
             escPressedLastFrame = true;
         } else {
             escPressedLastFrame = false;
