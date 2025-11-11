@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "engine.h"
+#include "components/Light/DirectionalLight.h"
 #include "core/shader.h"
 #include "core/stb_image.h"
 #include "components/GameObject.h"
@@ -148,7 +149,8 @@ int main()
 
         Camera* userCamera = GetUserCamera();
         PointLight* pointLight = GetPointLight();
-        
+        DirectionalLight* dirLight = PointEngine::GetDirectionalLight();
+
         glm::mat4 viewMatrix = userCamera->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
         glm::mat4 model = glm::mat4(1.0f);
@@ -157,14 +159,39 @@ int main()
         model = glm::rotate(model, glm::radians(userCamera->transform.rotation.y), glm::vec3(0, 1, 0));
         model = glm::scale(model, userCamera->transform.scale);
 
-        shader.use();        
-        shader.setVec3("lightPos", pointLight->transform.position);
-        shader.setVec3("lightColor", pointLight->color);
-        shader.setVec3("viewPos", userCamera->transform.position);
-        shader.setMat4("model", model);
-        shader.setMat4("view", viewMatrix);
+        shader.use();
+        shader.setVec3("light.direction", dirLight->direction);
+        shader.setVec3("viewPos", PointEngine::GetUserCamera()->transform.position);
+
+        // light properties
+        shader.setVec3("light.ambient", dirLight->ambient);
+        shader.setVec3("light.diffuse", dirLight->diffuse);
+        shader.setVec3("light.specular", dirLight->specular);
+
+        shader.setFloat("light.constant", dirLight->constant);
+        shader.setFloat("light.linear", dirLight->linear);
+        shader.setFloat("light.quadratic", dirLight->quadratic);
+
+        shader.setVec3("light.position",  userCamera->transform.position);
+        shader.setVec3("light.direction", userCamera->GetForwardVector());
+        shader.setFloat("light.cutOff",   glm::cos(glm::radians(12.5f)));
+        // material properties
+        shader.setFloat("material.shininess", 32.0f);
+
+        // view/projection transformations
+        glm::mat4 view = PointEngine::GetUserCamera()->GetViewMatrix();
         shader.setMat4("projection", projection);
-        shader.setFloat("lightIntensity", pointLight->intensity);
+        shader.setMat4("view", view);
+
+        // world transformation
+        shader.setMat4("model", model);
+
+        // bind diffuse map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        // bind specular map
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture);
         
         DrawAll(shader.ID, VAO);
 

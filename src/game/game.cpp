@@ -21,6 +21,7 @@ namespace {
     Mesh* cube = nullptr;
     Mesh* cube2 = nullptr;
     PointLight* pointLight = nullptr;
+    DirectionalLight* dirLight = nullptr;
     Camera* userCamera = nullptr;
     std::string wallTexture = "resources/Textures/container.jpg"; // big engine optimization
 }
@@ -33,6 +34,11 @@ namespace PointEngine {
         cube = new Mesh;
         cube2 = new Mesh;
         pointLight = new PointLight(PointEngine::convertColor255To1({255, 255, 255}), 1.0f);
+        dirLight = new DirectionalLight(glm::vec3(-0.2f, -1.0f, -0.3f),
+                                                  PointEngine::convertColor255To1({50, 50, 50}),
+                                                  PointEngine::convertColor255To1({200, 200, 200}),
+                                                  PointEngine::convertColor255To1({255, 255, 255}),
+                                                  1.0f, 0.09f, 0.032f);
         userCamera = new Camera;
         
         userCamera->transform.position = {0, 0, 3};
@@ -59,6 +65,7 @@ namespace PointEngine {
     }
 
     void Update() {
+        forward = userCamera->GetForwardVector();
         // Access scene objects through the accessor function
         for (auto obj : GetSceneObjects()) obj->Update();
         if (cube) {
@@ -153,5 +160,9 @@ namespace PointEngine {
     
     PointLight* GetPointLight() {
         return pointLight;
+    }
+    
+    DirectionalLight* GetDirectionalLight() {
+       return dirLight;
     }
 }

@@ -10,6 +10,7 @@ namespace PointEngine {
 class Camera : public GameObject {
 public:
     glm::mat4 GetViewMatrix();
+    glm::vec3 GetForwardVector();
 };
 
 } // namespace PointEngine

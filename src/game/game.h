@@ -7,6 +7,7 @@
 #include "../components/Camera.h"
 #include "../components/Mesh.h"
 #include "../components/Light/PointLight.h"
+#include "../components/Light/DirectionalLight.h"
 #include "../engine.h"
 
 namespace PointEngine {
@@ -23,7 +24,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 // Accessors for game objects (internal use only (as i understand))
 Camera* GetUserCamera();
 PointLight* GetPointLight();
-
+DirectionalLight* GetDirectionalLight();
 } // namespace PointEngine
 
 #endif // GAME_H
