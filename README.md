@@ -75,7 +75,9 @@ Requirements
 - CMake 3.26+ (or newer)
 - OpenGL development headers / drivers
 
-build variants
+build variants:
+
+Windows:
    - git clone https://github.com/kltz4074/PointEngine
    - cd PointEngine
    - mkdir build
