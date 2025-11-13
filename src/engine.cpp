@@ -6,12 +6,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "engine.h"
-#include "components/Light/DirectionalLight.h"
 #include "core/shader.h"
 #include "core/stb_image.h"
 #include "components/GameObject.h"
 #include "components/Camera.h"
-#include "components/Light/PointLight.h"
 #include "components/Meshes/Cube.h"
 #include "game/game.h"
 #include "components/LightManager.h"
