@@ -7,7 +7,7 @@ public:
     glm::vec3 diffuse;
     glm::vec3 specular;
     float shininess;
-    Shader* shader; // <- новый параметр
+    Shader* shader;
 
     Material()
         : ambient(1.0f), diffuse(1.0f), specular(1.0f),

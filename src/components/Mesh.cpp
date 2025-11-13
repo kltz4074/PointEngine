@@ -1,20 +1,39 @@
 #include "Mesh.h"
+#include <iostream>
 
 namespace PointEngine {
 
 void Material::LoadTexture() {
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Настройка фильтров и повторения
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
+    if (data) {
+        GLenum format = GL_RGB;
+        if (nrChannels == 1) format = GL_RED;
+        else if (nrChannels == 3) format = GL_RGB;
+        else if (nrChannels == 4) format = GL_RGBA;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
+    } else {
+        std::cout << "Failed to load texture: " << texturePath << std::endl;
     }
     stbi_image_free(data);
+}
+
+void Mesh::Draw(GLuint shaderID, GLuint VAO) {
+    // VAO должен быть привязан заранее или внутри Mesh
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // 36 для куба
+    glBindVertexArray(0);
 }
 
 } // namespace PointEngine

@@ -3,7 +3,6 @@
 
 #include "GameObject.h"
 #include <string>
-#include <iostream>
 #include <glad/glad.h>
 #include "../core/stb_image.h"
 
@@ -11,17 +10,19 @@ namespace PointEngine {
 
 struct Material {
     std::string texturePath;
-    float shininess;
-    
-    void LoadTexture();
+    GLuint textureID = 0; // ID текстуры для OpenGL
+    float shininess = 32.0f;
+
+    void LoadTexture(); // теперь создаёт textureID
 };
 
 class Mesh : public GameObject {
 public:
     Material material;
+
+    void Draw(GLuint shaderID, GLuint VAO); // каждый Mesh умеет рисовать себя
 };
 
 } // namespace PointEngine
 
 #endif // MESH_H
-

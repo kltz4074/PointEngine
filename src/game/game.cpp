@@ -1,5 +1,6 @@
 #include "game.h"
 #include "engine.h"
+#include "../components/LightManager.h"
 #include <iostream>
 #include <string>
 #include <glm/glm.hpp>
@@ -12,62 +13,68 @@ namespace {
     bool firstMouse = true;
     float lastX = 400.0f;
     float lastY = 300.0f;
-    float yaw = -90.0f; // чтобы смотреть вперёд, а не вправо
+    float yaw = -90.0f; // чтобы смотреть вперёд
     float pitch = 0.0f;
     const float sensitivity = 0.1f;
     bool CursorEnabled = true;
     glm::vec3 forward;
-    
+
     Mesh* cube = nullptr;
     Mesh* cube2 = nullptr;
-    PointLight* pointLight = nullptr;
-    DirectionalLight* dirLight = nullptr;
     Camera* userCamera = nullptr;
-    std::string wallTexture = "resources/Textures/container.jpg"; // big engine optimization
+
+    std::string wallTexture = "resources/Textures/container.jpg";
+    std::string brickTexture = "resources/Textures/wall.jpg";
 }
 
 namespace PointEngine {
+
     void Start() {
         std::cout << "game started :>\n";
-        
-        // Initialize game objects
-        cube = new Mesh;
-        cube2 = new Mesh;
-        pointLight = new PointLight(PointEngine::convertColor255To1({255, 255, 255}), 1.0f);
-        dirLight = new DirectionalLight(glm::vec3(-0.2f, -1.0f, -0.3f),
-                                                  PointEngine::convertColor255To1({50, 50, 50}),
-                                                  PointEngine::convertColor255To1({200, 200, 200}),
-                                                  PointEngine::convertColor255To1({255, 255, 255}),
-                                                  1.0f, 0.09f, 0.032f);
+
+        // === Камера ===
         userCamera = new Camera;
-        
-        userCamera->transform.position = {0, 0, 3};
-        userCamera->transform.rotation = {0, 0, 0};
-        pointLight->transform.position = {0, 0, 0};
-        cube->transform.position = {1, 0, 0};
+        userCamera->transform.position = { 0, 0, 3 };
+        userCamera->transform.rotation = { 0, 0, 0 };
+
+        // === Свет ===
+        auto* pointLight = new PointLight(glm::vec3(1.0f), 1.0f);
+        pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
+        AddPointLight(pointLight);
+
+        auto* dirLight = new DirectionalLight(
+            glm::vec3(-0.2f, -1.0f, -0.3f),
+            glm::vec3(0.2f),
+            glm::vec3(0.5f),
+            glm::vec3(1.0f)
+        );
+        AddDirectionalLight(dirLight);
+
+        // === Объекты ===
+        cube = new Mesh;
+        cube->transform.position = { 1, 0, 0 };
         cube->material.texturePath = wallTexture;
-
-        cube2->transform.position = {0, -2, 0};
-        cube2->transform.scale.x = 20;
-        cube2->transform.scale.z = 20;
-        cube2->material.texturePath = wallTexture;
-
         cube->material.LoadTexture();
-        cube2->material.LoadTexture();
-
         AddGameObject(cube);
+
+        cube2 = new Mesh;
+        cube2->transform.position = { 0, -2, 0 };
+        cube2->transform.scale = { 20, 1, 20 };
+        cube2->material.texturePath = brickTexture;
+        cube2->material.LoadTexture();
         AddGameObject(cube2);
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
-        
-        // Call Start on all game objects
+
+        // Вызов Start() у всех объектов
         for (auto obj : GetSceneObjects()) obj->Start();
     }
 
     void Update() {
         forward = userCamera->GetForwardVector();
-        // Access scene objects through the accessor function
+
         for (auto obj : GetSceneObjects()) obj->Update();
+
         if (cube) {
             cube->transform.rotation.y += 1.0f * GetDeltaTime();
         }
@@ -89,7 +96,7 @@ namespace PointEngine {
         }
 
         float xoffset = x - lastX;
-        float yoffset = lastY - y; // переворачиваем (как в OpenGL)
+        float yoffset = lastY - y; // переворот оси Y
         lastX = x;
         lastY = y;
 
@@ -99,8 +106,8 @@ namespace PointEngine {
         yaw += xoffset;
         pitch += yoffset;
 
-        // ограничиваем pitch, чтобы камера не переворачивалась
-        if (pitch > 89.0f)  pitch = 89.0f;
+        // ограничиваем pitch
+        if (pitch > 89.0f) pitch = 89.0f;
         if (pitch < -89.0f) pitch = -89.0f;
 
         forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -108,7 +115,6 @@ namespace PointEngine {
         forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         forward = glm::normalize(forward);
 
-        // обновляем направление камеры
         if (userCamera) {
             userCamera->transform.rotation.y = yaw;
             userCamera->transform.rotation.x = pitch;
@@ -117,52 +123,43 @@ namespace PointEngine {
 
     void ProcessInput(GLFWwindow* window) {
         if (!userCamera) return;
-        
-        float BasicSpeed = 5.0f * GetDeltaTime();
-        float RunningSpeed = 10.0f * GetDeltaTime();
-        float currentSpeed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? RunningSpeed : BasicSpeed;
+
+        float basicSpeed = 5.0f * GetDeltaTime();
+        float runSpeed = 10.0f * GetDeltaTime();
+        float speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? runSpeed : basicSpeed;
 
         glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0, 1.0, 0.0)));
         glm::vec3 up = glm::normalize(glm::cross(right, forward));
 
-        // движение камеры
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            userCamera->transform.position += forward * currentSpeed;
+            userCamera->transform.position += forward * speed;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            userCamera->transform.position -= forward * currentSpeed;
+            userCamera->transform.position -= forward * speed;
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            userCamera->transform.position -= right * currentSpeed;
+            userCamera->transform.position -= right * speed;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            userCamera->transform.position += right * currentSpeed;
+            userCamera->transform.position += right * speed;
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-            userCamera->transform.position.y -= currentSpeed;
+            userCamera->transform.position.y -= speed;
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            userCamera->transform.position.y += currentSpeed;
-            
-        static bool escPressedLastFrame = false;
+            userCamera->transform.position.y += speed;
 
+        static bool escPressedLastFrame = false;
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            if (!escPressedLastFrame) { // сработает только один раз на нажатие
+            if (!escPressedLastFrame) {
                 CursorEnabled = !CursorEnabled;
-                glfwSetInputMode(window, GLFW_CURSOR, 
+                glfwSetInputMode(window, GLFW_CURSOR,
                     CursorEnabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
             }
-            firstMouse = true; // чтобы избежать резкого скачка при повторном захвате курсора
+            firstMouse = true;
             escPressedLastFrame = true;
-        } else {
+        }
+        else {
             escPressedLastFrame = false;
         }
     }
-    
+
     Camera* GetUserCamera() {
         return userCamera;
-    }
-    
-    PointLight* GetPointLight() {
-        return pointLight;
-    }
-    
-    DirectionalLight* GetDirectionalLight() {
-       return dirLight;
     }
 }

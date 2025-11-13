@@ -28,6 +28,7 @@ add_executable(PointEngine
     src/components/GameObject.cpp
     src/components/Camera.cpp
     src/components/Mesh.cpp
+    src/components/LightManager.cpp
     src/components/Light/PointLight.cpp
     src/components/Light/DirectionalLight.cpp
     src/components/Meshes/Cube.cpp

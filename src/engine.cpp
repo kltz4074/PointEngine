@@ -1,4 +1,3 @@
-
 #include <cstddef>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -15,6 +14,7 @@
 #include "components/Light/PointLight.h"
 #include "components/Meshes/Cube.h"
 #include "game/game.h"
+#include "components/LightManager.h"
 
 using namespace PointEngine;
 
@@ -116,92 +116,83 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
+    
     Start();
-    while (!glfwWindowShouldClose(window))
-    {
 
-        now = glfwGetTime();
-        SetDeltaTime(now - oldTimeSinceStart);
-        oldTimeSinceStart = now;
+    // --- внутри main(), после Start() ---
+while (!glfwWindowShouldClose(window))
+{
+    now = glfwGetTime();
+    SetDeltaTime(now - oldTimeSinceStart);
+    oldTimeSinceStart = now;
 
-        fpsTimer += GetDeltaTime();
-        frames++;
+    fpsTimer += GetDeltaTime();
+    frames++;
 
-        if (fpsTimer >= 1.0) {
-            fps = frames;
-            frames = 0;
-            fpsTimer = 0.0;
-            std::cout << "FPS: " << fps << std::endl;
-        } 
-        glfwSetCursorPosCallback(window, mouse_callback);
-        ProcessInput(window); // input
-        Update(); 
+    if (fpsTimer >= 1.0) {
+        fps = frames;
+        frames = 0;
+        fpsTimer = 0.0;
+        std::cout << "FPS: " << fps << std::endl;
+    }
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Ввод и мышь
+    glfwSetCursorPosCallback(window, mouse_callback);
+    ProcessInput(window);
+    Update();
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+    // Очистка экрана
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
 
-        Camera* userCamera = GetUserCamera();
-        PointLight* pointLight = GetPointLight();
-        DirectionalLight* dirLight = PointEngine::GetDirectionalLight();
+    // Матрицы камеры
+    Camera* cam = GetUserCamera();
+    glm::mat4 view = cam->GetViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
-        glm::mat4 viewMatrix = userCamera->GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+    // Активируем шейдер
+    shader.use();
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+    shader.setVec3("viewPos", cam->transform.position);
+
+    // Загружаем все источники света
+    UploadLightsToShader(shader);
+
+    // Рендерим все объекты
+    for (auto obj : GetSceneObjects()) {
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, userCamera->transform.position);
-        model = glm::rotate(model, glm::radians(userCamera->transform.rotation.x), glm::vec3(1, 0, 0));
-        model = glm::rotate(model, glm::radians(userCamera->transform.rotation.y), glm::vec3(0, 1, 0));
-        model = glm::scale(model, userCamera->transform.scale);
-
-        shader.use();
-        shader.setVec3("light.direction", dirLight->direction);
-        shader.setVec3("viewPos", PointEngine::GetUserCamera()->transform.position);
-
-        // light properties
-        shader.setVec3("light.ambient", dirLight->ambient);
-        shader.setVec3("light.diffuse", dirLight->diffuse);
-        shader.setVec3("light.specular", dirLight->specular);
-
-        shader.setFloat("light.constant", dirLight->constant);
-        shader.setFloat("light.linear", dirLight->linear);
-        shader.setFloat("light.quadratic", dirLight->quadratic);
-
-        shader.setVec3("light.position",  userCamera->transform.position);
-        shader.setVec3("light.direction", userCamera->GetForwardVector());
-        shader.setFloat("light.cutOff",   glm::cos(glm::radians(12.5f)));
-        // material properties
-        shader.setFloat("material.shininess", 32.0f);
-
-        // view/projection transformations
-        glm::mat4 view = PointEngine::GetUserCamera()->GetViewMatrix();
-        shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
-
-        // world transformation
+        model = glm::translate(model, obj->transform.position);
+        model = glm::rotate(model, glm::radians(obj->transform.rotation.x), glm::vec3(1,0,0));
+        model = glm::rotate(model, glm::radians(obj->transform.rotation.y), glm::vec3(0,1,0));
+        model = glm::rotate(model, glm::radians(obj->transform.rotation.z), glm::vec3(0,0,1));
+        model = glm::scale(model, obj->transform.scale);
         shader.setMat4("model", model);
 
-        // bind diffuse map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        // bind specular map
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        
-        DrawAll(shader.ID, VAO);
+        // Если объект имеет материал с текстурой
+        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID); // textureID должен быть в LoadTexture
+            shader.setInt("material.diffuse", 0);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+            shader.setInt("material.specular", 1);
+        }
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        PointEngine::DrawAll(shader.ID, VAO);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        // Рисуем объект
+        obj->Draw(shader.ID, 0); // VAO у Mesh должен быть внутри Draw()
     }
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+
+
     End();
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
