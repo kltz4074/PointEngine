@@ -38,7 +38,7 @@ namespace PointEngine {
         userCamera->transform.rotation = { 0, 0, 0 };
 
         auto* pointLight = new PointLight(glm::vec3(1.0f), 1.0f);
-        auto* pointLight2 = new PointLight(glm::vec3(1.0f), 200.0f);
+        auto* pointLight2 = new PointLight(glm::vec3(1.0f), 2000.0f);
         
 
         pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
@@ -51,7 +51,6 @@ namespace PointEngine {
             glm::vec3(0.5f),
             glm::vec3(1.0f)
         );
-        AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
         // === Объекты ===
         cube = new Mesh;
@@ -79,7 +78,7 @@ namespace PointEngine {
         for (auto obj : GetSceneObjects()) obj->Update();
 
         if (cube) {
-            cube->transform.rotation.y += 20.0f * GetDeltaTime();
+            cube->transform.rotation.y += 90.0f * GetDeltaTime();
         }
     }
 
