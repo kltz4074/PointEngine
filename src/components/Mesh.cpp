@@ -1,6 +1,19 @@
-// Mesh.cpp
 #include "Mesh.h"
 #include <glad/glad.h>
+
+// Add missing constructor implementation
+Mesh::Mesh(std::vector<Vertex> vertices,
+           std::vector<unsigned int> indices,
+           std::vector<Texture> textures)
+    : vertices(std::move(vertices))
+    , indices(std::move(indices))
+    , textures(std::move(textures))
+    , VAO(0)
+    , VBO(0)
+    , EBO(0)
+{
+    setupMesh();
+}
 
 void Mesh::Draw(Shader& shader)
 {
