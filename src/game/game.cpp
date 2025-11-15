@@ -10,10 +10,14 @@ using namespace PointEngine;
 
 // Game state
 namespace {
+    bool firstMouse = true;
+    float lastX = 400.0f;
+    float lastY = 300.0f;
+    float yaw = -90.0f; // чтобы смотреть вперёд
+    float pitch = 0.0f;
     const float sensitivity = 0.1f;
     bool CursorEnabled = true;
     glm::vec3 forward;
-    glm::vec2 MousePos;
 
     Mesh* cube = nullptr;
     Mesh* cube2 = nullptr;
@@ -25,7 +29,7 @@ namespace {
 
 namespace PointEngine {
 
-    void Start() { // on programm starts
+    void Start() {
         std::cout << "game started :>\n";
 
         // === Камера ===
@@ -34,7 +38,7 @@ namespace PointEngine {
         userCamera->transform.rotation = { 0, 0, 0 };
 
         auto* pointLight = new PointLight(glm::vec3(1.0f), 1.0f);
-        auto* pointLight2 = new PointLight(glm::vec3(1.0f), 2000.0f);
+        auto* pointLight2 = new PointLight(glm::vec3(1.0f), 1.0f);
         
 
         pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
@@ -43,10 +47,11 @@ namespace PointEngine {
 
         auto* dirLight = new DirectionalLight(
             glm::vec3(-0.2f, -1.0f, -0.3f),
-            glm::vec3(0.2f),
-            glm::vec3(0.5f),
-            glm::vec3(1.0f)
+            glm::vec3(0.01f),
+            glm::vec3(0.1f),
+            glm::vec3(0.5f)
         );
+        AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
         // === Объекты ===
         cube = new Mesh;
@@ -68,32 +73,95 @@ namespace PointEngine {
         for (auto obj : GetSceneObjects()) obj->Start();
     }
 
-    void Update() { // every frame
+    void Update() {
         forward = userCamera->GetForwardVector();
 
         for (auto obj : GetSceneObjects()) obj->Update();
 
         if (cube) {
-            cube->transform.rotation.y += 90.0f * GetDeltaTime();
+            cube->transform.rotation.y += 20.0f * GetDeltaTime();
         }
-        
-        GLFWwindow* window = PointEngine::GetGlfwWindow();
-
-        userCamera->FlyCameraMovement(window, MousePos.x, MousePos.y, sensitivity, userCamera, forward, 5.0f, 9.0f, CursorEnabled);
     }
 
-    void End() { // when programm closes
+    void End() {
         RemoveObjs();
         std::cout << "game ended :<\n";
     }
 
     void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-        MousePos = {xpos, ypos};
+        float x = static_cast<float>(xpos);
+        float y = static_cast<float>(ypos);
+
+        if (firstMouse) {
+            lastX = x;
+            lastY = y;
+            firstMouse = false;
+        }
+
+        float xoffset = x - lastX;
+        float yoffset = lastY - y; // переворот оси Y
+        lastX = x;
+        lastY = y;
+
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
+
+        yaw += xoffset;
+        pitch += yoffset;
+
+        // ограничиваем pitch
+        if (pitch > 89.0f) pitch = 89.0f;
+        if (pitch < -89.0f) pitch = -89.0f;
+
+        forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        forward.y = sin(glm::radians(pitch));
+        forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        forward = glm::normalize(forward);
+
+        if (userCamera) {
+            userCamera->transform.rotation.y = yaw;
+            userCamera->transform.rotation.x = pitch;
+        }
     }
 
-    glm::vec2 GetMousePos() {
-        return MousePos;
+    void ProcessInput(GLFWwindow* window) {
+        if (!userCamera) return;
+
+        float basicSpeed = 5.0f * GetDeltaTime();
+        float runSpeed = 10.0f * GetDeltaTime();
+        float speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? runSpeed : basicSpeed;
+
+        glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0, 1.0, 0.0)));
+        glm::vec3 up = glm::normalize(glm::cross(right, forward));
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            userCamera->transform.position += forward * speed;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            userCamera->transform.position -= forward * speed;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            userCamera->transform.position -= right * speed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            userCamera->transform.position += right * speed;
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            userCamera->transform.position.y -= speed;
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            userCamera->transform.position.y += speed;
+
+        static bool escPressedLastFrame = false;
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            if (!escPressedLastFrame) {
+                CursorEnabled = !CursorEnabled;
+                glfwSetInputMode(window, GLFW_CURSOR,
+                    CursorEnabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+            }
+            firstMouse = true;
+            escPressedLastFrame = true;
+        }
+        else {
+            escPressedLastFrame = false;
+        }
     }
+
     Camera* GetUserCamera() {
         return userCamera;
     }
