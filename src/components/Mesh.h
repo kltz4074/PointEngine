@@ -19,7 +19,7 @@ struct Material {
 class Mesh : public GameObject {
 public:
     Material material;
-
+    
     void Draw(GLuint shaderID, GLuint VAO); // каждый Mesh умеет рисовать себя
 };
 
