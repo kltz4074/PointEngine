@@ -172,12 +172,50 @@ while (!glfwWindowShouldClose(window))
 
         // Если объект имеет материал с текстурой
         if (auto mesh = dynamic_cast<Mesh*>(obj)) {
+            // Bind textures manually based on type
+            unsigned int diffuseNr = 1;
+            unsigned int specularNr = 1;
+            unsigned int normalNr = 1;
+            unsigned int heightNr = 1;
+
+            for (unsigned int i = 0; i < mesh->textures.size(); i++) {
+                glActiveTexture(GL_TEXTURE0 + i);
+
+                std::string name = mesh->textures[i].type;
+                std::string number;
+                int textureUnit = i;
+
+                if (name == "texture_diffuse") {
+                    number = std::to_string(diffuseNr++);
+                    shader.setInt(("material.diffuse" + number).c_str(), i);
+                }
+                else if (name == "texture_specular") {
+                    number = std::to_string(specularNr++);
+                    shader.setInt(("material.specular" + number).c_str(), i);
+                }
+                else if (name == "texture_normal") {
+                    number = std::to_string(normalNr++);
+                    shader.setInt(("material.normal" + number).c_str(), i);
+                }
+                else if (name == "texture_height") {
+                    number = std::to_string(heightNr++);
+                    shader.setInt(("material.height" + number).c_str(), i);
+                }
+
+                glBindTexture(GL_TEXTURE_2D, mesh->textures[i].id);
+            }
+
+            // Optional: Set default texture units if you want fixed slots
+            // shader.setInt("material.diffuse", 0);
+            // shader.setInt("material.specular", 1);
+
+            // Draw the mesh
+            glBindVertexArray(mesh->VAO);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->indices.size()), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+
+            // Reset active texture
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID); // textureID должен быть в LoadTexture
-            shader.setInt("material.diffuse", 0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
-            shader.setInt("material.specular", 1);
         }
 
         PointEngine::DrawAll(shader.ID, VAO);

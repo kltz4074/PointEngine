@@ -1,28 +1,49 @@
+// Mesh.h
 #ifndef MESH_H
 #define MESH_H
 
-#include "GameObject.h"
-#include <string>
 #include <glad/glad.h>
-#include "../core/stb_image.h"
+#include <glm/glm.hpp>
+#include <vector>
+#include <string>
+#include "../core/shader.h"
+#include "../components/GameObject.h"
 
-namespace PointEngine {
+#define MAX_BONE_INFLUENCE 4
 
-struct Material {
-    std::string texturePath;
-    GLuint textureID = 0; // ID текстуры для OpenGL
-    float shininess = 32.0f;
-
-    void LoadTexture(); // теперь создаёт textureID
+struct Vertex {
+    glm::vec3 Position;
+    glm::vec3 Normal;
+    glm::vec2 TexCoords;
+    glm::vec3 Tangent;
+    glm::vec3 Bitangent;
+    int m_BoneIDs[MAX_BONE_INFLUENCE];
+    float m_Weights[MAX_BONE_INFLUENCE];
 };
 
-class Mesh : public GameObject {
+struct Texture {
+    unsigned int id;
+    std::string type;
+    std::string path;
+};
+
+// Remove any PointEngine::Texture
+struct Texture;  // forward declare if needed
+
+class Mesh : public PointEngine::GameObject {
 public:
-    Material material;
-    
-    void Draw(GLuint shaderID, GLuint VAO); // каждый Mesh умеет рисовать себя
+    std::vector<Vertex>       vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture>      textures;  // ← global Texture
+    unsigned int VAO;
+
+    Mesh(std::vector<Vertex> vertices,
+         std::vector<unsigned int> indices,
+         std::vector<Texture> textures);  // ← global Texture
+    void Draw(Shader& shader);
+
+private:
+    unsigned int VBO, EBO;
+    void setupMesh();
 };
-
-} // namespace PointEngine
-
-#endif // MESH_H
+#endif
