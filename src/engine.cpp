@@ -1,14 +1,9 @@
 // engine.cpp
-#include <cstddef>
 #include <iostream>
-
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include "engine.h"
 #include "core/shader.h"
 #include "core/stb_image.h"
@@ -26,6 +21,7 @@ namespace {
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
     bool VsyncEnabled = false;
+    GLFWwindow* window;
 }
 
 // Forward declarations
@@ -39,6 +35,10 @@ namespace PointEngine {
     
     void SetDeltaTime(double dt) {
         g_deltaTime = dt;
+    }
+
+    GLFWwindow* GetGlfwWindow() {
+        return window;
     }
 }
 
@@ -78,7 +78,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "PointEngine", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "PointEngine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
@@ -179,7 +179,6 @@ int main()
         }
 
         // Input & updates
-        ProcessInput(window);
         Update();
 
         // Clear frame (alpha=0 allows transparent framebuffer behaviour on supported platforms)

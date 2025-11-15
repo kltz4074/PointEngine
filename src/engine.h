@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 namespace PointEngine {
 
 /**
@@ -38,7 +39,7 @@ inline glm::vec3 convertColor1To255(const glm::vec3 color) {
  * @return delta time in seconds
  */
 double GetDeltaTime();
-
+GLFWwindow* GetGlfwWindow();
 /**
  * @brief set the delta time (internal use only (as i understand))
  * @param dt delta time in seconds

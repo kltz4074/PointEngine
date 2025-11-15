@@ -18,13 +18,15 @@ void Update();
 void End();
 
 // Input processing
-void ProcessInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 // Accessors for game objects (internal use only (as i understand))
 Camera* GetUserCamera();
 PointLight* GetPointLight();
 DirectionalLight* GetDirectionalLight();
+
+glm::vec2 GetMousePos();
+
 } // namespace PointEngine
 
 #endif // GAME_H
