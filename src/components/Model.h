@@ -12,13 +12,12 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Mesh.h"
+#include "mesh.h"
 #include "../core/shader.h"
 
 #include <string>
 #include <iostream>
 #include <vector>
-
 using namespace std;
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
@@ -47,7 +46,8 @@ public:
     
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
-    void loadModel(string const &path) {
+    void loadModel(string const &path)
+    {
         // read file via ASSIMP
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -65,7 +65,8 @@ private:
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-    void processNode(aiNode *node, const aiScene *scene) {
+    void processNode(aiNode *node, const aiScene *scene)
+    {
         // process each mesh located at the current node
         for(unsigned int i = 0; i < node->mNumMeshes; i++)
         {
@@ -82,7 +83,8 @@ private:
 
     }
 
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene) {
+    Mesh processMesh(aiMesh *mesh, const aiScene *scene)
+    {
         // data to fill
         vector<Vertex> vertices;
         vector<unsigned int> indices;
@@ -167,7 +169,8 @@ private:
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
-    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
+    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
+    {
         vector<Texture> textures;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
@@ -199,7 +202,8 @@ private:
 };
 
 
-unsigned int TextureFromFile(const char *path, const string &directory, bool gamma) {
+unsigned int TextureFromFile(const char *path, const string &directory, bool gamma)
+{
     string filename = string(path);
     filename = directory + '/' + filename;
 

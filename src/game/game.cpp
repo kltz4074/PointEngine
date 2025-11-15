@@ -1,7 +1,9 @@
 // game.cpp
 #include "game.h"
 #include "engine.h"
-#include "../components/LightManager.h"          // <-- our tiny loader (see below)
+#include "../components/LightManager.h"
+#include "../components/model.h"
+
 #include <iostream>
 #include <string>
 #include <glm/glm.hpp>
@@ -9,192 +11,183 @@
 
 using namespace PointEngine;
 
-/* --------------------------------------------------------------------- */
-/* 1. Cube geometry – static, can be replaced by your own data later    */
-/* --------------------------------------------------------------------- */
-static std::vector<Vertex> CubeVertices()
+/* ------------------------------------------------------------- */
+/* 1. Game State (только нужные переменные)                      */
+/* ------------------------------------------------------------- */
+namespace
 {
-    const float s = 0.5f;                     // half-size
-    std::vector<Vertex> v(36);                // 6 faces × 6 verts (2 triangles)
-
-    // Helper lambda to fill a face
-    auto face = [&](int i, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,
-                   glm::vec3 n, glm::vec2 uv0, glm::vec2 uv1,
-                   glm::vec2 uv2, glm::vec2 uv3)
-    {
-        v[i*6+0] = {p0, n, uv0};
-        v[i*6+1] = {p1, n, uv1};
-        v[i*6+2] = {p2, n, uv2};
-        v[i*6+3] = {p2, n, uv2};
-        v[i*6+4] = {p3, n, uv3};
-        v[i*6+5] = {p0, n, uv0};
-    };
-
-    // front
-    face(0,
-         {-s,-s, s}, { s,-s, s}, { s, s, s}, {-s, s, s},
-         {0,0,1}, {0,0}, {1,0}, {1,1}, {0,1});
-    // back
-    face(1,
-         { s,-s,-s}, {-s,-s,-s}, {-s, s,-s}, { s, s,-s},
-         {0,0,-1}, {0,0}, {1,0}, {1,1}, {0,1});
-    // left
-    face(2,
-         {-s,-s,-s}, {-s,-s, s}, {-s, s, s}, {-s, s,-s},
-         {-1,0,0}, {0,0}, {1,0}, {1,1}, {0,1});
-    // right
-    face(3,
-         { s,-s, s}, { s,-s,-s}, { s, s,-s}, { s, s, s},
-         {1,0,0}, {0,0}, {1,0}, {1,1}, {0,1});
-    // bottom
-    face(4,
-         {-s,-s,-s}, { s,-s,-s}, { s,-s, s}, {-s,-s, s},
-         {0,-1,0}, {0,0}, {1,0}, {1,1}, {0,1});
-    // top
-    face(5,
-         {-s, s, s}, { s, s, s}, { s, s,-s}, {-s, s,-s},
-         {0,1,0}, {0,0}, {1,0}, {1,1}, {0,1});
-
-    return v;
-}
-
-static std::vector<unsigned int> CubeIndices()
-{
-    std::vector<unsigned int> idx;
-    for (unsigned int i = 0; i < 36; ++i) idx.push_back(i);
-    return idx;
-}
-
-/* --------------------------------------------------------------------- */
-/* 2. Game state (anonymous namespace)                                   */
-/* --------------------------------------------------------------------- */
-namespace {
-    bool firstMouse = true;
-    float lastX = 400.0f, lastY = 300.0f;
-    float yaw = -90.0f, pitch = 0.0f;
-    const float sensitivity = 0.1f;
-    bool CursorEnabled = true;
-    glm::vec3 forward;
-
-    Mesh*   cube  = nullptr;
-    Mesh*   cube2 = nullptr;
     Camera* userCamera = nullptr;
 
-    const std::string wallTexture  = "resources/Textures/container.jpg";
-    const std::string brickTexture = "resources/Textures/wall.jpg";
+    bool cursorEnabled = true;
+
+    // Мышь
+    bool firstMouse = true;
+    float lastX = 0.0f, lastY = 0.0f;
+
+    float yaw = -90.0f;
+    float pitch = 0.0f;
+    const float sensitivity = 0.12f;
+
+    glm::vec3 forward(0,0,-1);
+
+    // Модель
+    Model* backpackModel = nullptr;
 }
 
-/* --------------------------------------------------------------------- */
-/* 3. Engine callbacks                                                   */
-/* --------------------------------------------------------------------- */
-namespace PointEngine {
+/* ------------------------------------------------------------- */
+/* 2. Start()                                                    */
+/* ------------------------------------------------------------- */
+namespace PointEngine
+{
+
 void Start()
 {
-    std::cout << "game started :>\n";
+    std::cout << "Game started\n";
 
-    userCamera = new Camera;
-    userCamera->transform.position = glm::vec3(0, 0, 3);
+    /* ---------- Camera ---------- */
+    userCamera = new Camera();
+    userCamera->transform.position = glm::vec3(0,0,3);
 
-    // Lights
-    auto* pointLight  = new PointLight(glm::vec3(1.0f), 1.0f);
-    auto* pointLight2 = new PointLight(glm::vec3(1.0f), 1.0f);
-    pointLight->transform.position  = glm::vec3(0.0f, 1.0f, 0.0f);
-    pointLight2->transform.position = glm::vec3(0.0f, 1.0f, 2.0f);
-    AddPointLight(pointLight);
-    AddPointLight(pointLight2);
+    /* ---------- Lights ---------- */
+    auto* pl1 = new PointLight(glm::vec3(1.0f), 1.0f);
+    auto* pl2 = new PointLight(glm::vec3(1.0f), 1.0f);
 
-    auto* dirLight = new DirectionalLight(
+    pl1->transform.position = glm::vec3(0,1,0);
+    pl2->transform.position = glm::vec3(0,1,2);
+
+    AddPointLight(pl1);
+    AddPointLight(pl2);
+
+    auto* dl = new DirectionalLight(
         glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.01f), glm::vec3(0.1f), glm::vec3(0.5f));
-    AddDirectionalLight(dirLight);
+        glm::vec3(0.01f),
+        glm::vec3(0.1f),
+        glm::vec3(0.5f)
+    );
+    AddDirectionalLight(dl);
 
-    // TEXTURES
-    Texture texWall  = LoadGLTexture(wallTexture,  "texture_diffuse");
-    Texture texBrick = LoadGLTexture(brickTexture, "texture_diffuse");
+    /* ---------- Load Model ---------- */
+    backpackModel = new Model("resources/Models/backpack/backpack.obj");
 
-    // CUBE 1
-    static const auto verts = CubeVertices();
-    static const auto inds  = CubeIndices();
-
-
-    forward = glm::vec3(0, 0, -1);
-    for (auto* obj : GetSceneObjects()) obj->Start();
+    /* ---------- Scene Objects Start() ---------- */
+    for (auto* obj : GetSceneObjects())
+        obj->Start();
 }
 
+/* ------------------------------------------------------------- */
+/* 3. Update()                                                   */
+/* ------------------------------------------------------------- */
 void Update()
 {
-    forward = userCamera->GetForwardVector();
+    glm::vec3 forward = userCamera->GetForwardVector();
 
-    for (auto* obj : GetSceneObjects()) obj->Update();
-
-    if (cube)
-        cube->transform.rotation.y += 20.0f * GetDeltaTime();
+    for (auto* obj : GetSceneObjects())
+        obj->Update();
+        
+    Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
+    backpackModel->Draw(shader);
+    /* ------- Draw our Model manually (упрощённо) ------- */
 }
 
+/* ------------------------------------------------------------- */
+/* 4. End()                                                      */
+/* ------------------------------------------------------------- */
 void End()
 {
     RemoveObjs();
-    std::cout << "game ended :<\n";
+    std::cout << "Game ended\n";
 }
 
-/* ---------- INPUT ---------- */
+/* ------------------------------------------------------------- */
+/* 5. Mouse Input                                                */
+/* ------------------------------------------------------------- */
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+    if (!userCamera) return;
+
     float x = static_cast<float>(xpos);
     float y = static_cast<float>(ypos);
 
-    if (firstMouse) { lastX = x; lastY = y; firstMouse = false; }
+    if (firstMouse)
+    {
+        lastX = x;
+        lastY = y;
+        firstMouse = false;
+    }
 
     float xoffset = (x - lastX) * sensitivity;
     float yoffset = (lastY - y) * sensitivity;
-    lastX = x; lastY = y;
+
+    lastX = x;
+    lastY = y;
 
     yaw   += xoffset;
     pitch += yoffset;
+
     if (pitch > 89.0f)  pitch = 89.0f;
     if (pitch < -89.0f) pitch = -89.0f;
 
-    forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    forward.y = sin(glm::radians(pitch));
-    forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    forward = glm::normalize(forward);
-
-    if (userCamera) {
-        userCamera->transform.rotation.y = yaw;
-        userCamera->transform.rotation.x = pitch;
-    }
+    userCamera->transform.rotation.x = pitch;
+    userCamera->transform.rotation.y = yaw;
 }
 
+/* ------------------------------------------------------------- */
+/* 6. Keyboard Input                                             */
+/* ------------------------------------------------------------- */
 void ProcessInput(GLFWwindow* window)
 {
     if (!userCamera) return;
 
-    float speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-                  ? 10.0f * GetDeltaTime()
-                  :  5.0f * GetDeltaTime();
+    float dt = GetDeltaTime();
 
-    glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0,1,0)));
-    glm::vec3 up    = glm::normalize(glm::cross(right, forward));
+    float speed =
+        (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        ? 10.0f * dt
+        :  5.0f * dt;
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) userCamera->transform.position += forward * speed;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) userCamera->transform.position -= forward * speed;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) userCamera->transform.position -= right  * speed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) userCamera->transform.position += right  * speed;
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) userCamera->transform.position.y -= speed;
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) userCamera->transform.position.y += speed;
+    glm::vec3 forward = userCamera->GetForwardVector();
+    glm::vec3 right   = glm::normalize(glm::cross(forward, glm::vec3(0,1,0)));
 
-    static bool escLast = false;
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        if (!escLast) {
-            CursorEnabled = !CursorEnabled;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        userCamera->transform.position += forward * speed;
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        userCamera->transform.position -= forward * speed;
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        userCamera->transform.position -= right * speed;
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        userCamera->transform.position += right * speed;
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        userCamera->transform.position.y -= speed;
+
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        userCamera->transform.position.y += speed;
+
+    /* ---- ESC toggle cursor ---- */
+    static bool lastEsc = false;
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        if (!lastEsc)
+        {
+            cursorEnabled = !cursorEnabled;
             glfwSetInputMode(window, GLFW_CURSOR,
-                CursorEnabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+                cursorEnabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+
             firstMouse = true;
         }
-        escLast = true;
-    } else escLast = false;
+        lastEsc = true;
+    }
+    else lastEsc = false;
 }
 
-Camera* GetUserCamera() { return userCamera; }
+/* ------------------------------------------------------------- */
+Camera* GetUserCamera()
+{
+    return userCamera;
+}
 
 } // namespace PointEngine

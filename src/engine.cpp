@@ -22,6 +22,7 @@ namespace {
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
     bool VsyncEnabled = false;
+    Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
 }
 
 // Forward declarations
@@ -68,8 +69,6 @@ int main()
         std::cout << "Failed to initialize GLAD :<" << std::endl;
         return -1;
     }
-
-    Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -243,4 +242,9 @@ while (!glfwWindowShouldClose(window))
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+
+Shader GetMainShader() {
+    return shader;
 }
