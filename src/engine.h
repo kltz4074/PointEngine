@@ -44,7 +44,7 @@ inline glm::vec3 convertColor1To255(const glm::vec3& color) {
     return glm::vec3(color.r * 255.0f, color.g * 255.0f, color.b * 255.0f);
 }
 
-Texture LoadGLTexture(const std::string& path, const std::string& type)
+inline Texture LoadGLTexture(const std::string& path, const std::string& type)
 {
     Texture tex{};
     tex.path = path;
