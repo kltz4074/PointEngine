@@ -83,7 +83,7 @@ Windows:
    - mkdir build
    - cd build
    - cmake ..
-   - cmake --build . --config Release
+   - cmake --build .. --config Release
    - cd ..
    - start build/PointEngine.exe
 
@@ -277,6 +277,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
