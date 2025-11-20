@@ -5,7 +5,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/trigonometric.hpp>
-
+#include "../components/Model.h"
 using namespace PointEngine;
 
 // Game state
@@ -25,6 +25,7 @@ namespace {
 
     std::string wallTexture = "resources/Textures/container.jpg";
     std::string brickTexture = "resources/Textures/wall.jpg";
+    Model model;
 }
 
 namespace PointEngine {
@@ -69,6 +70,7 @@ namespace PointEngine {
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
 
+        model.something("resources/Models/backpack/backpack.obj");
         // Вызов Start() у всех объектов
         for (auto obj : GetSceneObjects()) obj->Start();
     }
