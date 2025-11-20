@@ -10,7 +10,6 @@
 #include "core/stb_image.h"
 #include "components/GameObject.h"
 #include "components/Camera.h"
-#include "components/Meshes/Cube.h"
 #include "game/game.h"
 #include "components/LightManager.h"
 
@@ -70,31 +69,6 @@ int main()
     }
 
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
-
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, CubeVerticesSize * sizeof(float), CubeVertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, CubeIndicesSize * sizeof(unsigned int), CubeIndices, GL_STATIC_DRAW);
-
-    // 0: position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // 1: normal
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // 2: uv
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
 
     glEnable(GL_DEPTH_TEST);
@@ -180,8 +154,6 @@ while (!glfwWindowShouldClose(window))
             shader.setInt("material.specular", 1);
         }
 
-        PointEngine::DrawAll(shader.ID, VAO);
-
         // Рисуем объект
         obj->Draw(shader.ID, 0); // VAO у Mesh должен быть внутри Draw()
     }
@@ -192,8 +164,6 @@ while (!glfwWindowShouldClose(window))
 
 
     End();
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
     glDeleteProgram(shader.ID);
 
     

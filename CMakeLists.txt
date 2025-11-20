@@ -3,6 +3,9 @@ project(PointEngine)
 
 include(FetchContent)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # --- GLFW ---
 FetchContent_Declare(
     glfw
@@ -19,32 +22,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
-# --- ASSIMP ---
-FetchContent_Declare(
-    assimp
-    GIT_REPOSITORY https://github.com/assimp/assimp.git
-    GIT_TAG v5.4.3
-)
 
-set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
-set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+# --- RapidObj ---
+FetchContent_Declare(rapidobj
+    GIT_REPOSITORY  https://github.com/guybrush77/rapidobj.git
+    GIT_TAG         origin/master)
 
-set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(assimp)
-
-# ОТКЛЮЧАЕМ -Werror ДЛЯ ASSIMP
-target_compile_options(assimp PRIVATE
-    -Wno-error=unknown-pragmas
-    -Wno-unknown-pragmas
-    -Wno-error=deprecated-declarations  # на всякий случай
-)
+FetchContent_MakeAvailable(rapidobj)
 
 find_package(OpenGL REQUIRED)
 
@@ -66,7 +50,7 @@ target_include_directories(PointEngine
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${glm_SOURCE_DIR}
+        ${glm_SOURCE_DIR}        
 )
 
 target_link_libraries(PointEngine
@@ -74,8 +58,7 @@ target_link_libraries(PointEngine
         glfw
         OpenGL::GL
         glm
-        assimp
+        rapidobj::rapidobj
 )
 
-# Для совместимости с старыми версиями CMake (опционально)
 target_include_directories(PointEngine PRIVATE ${assimp_SOURCE_DIR}/include)
