@@ -157,34 +157,26 @@ while (!glfwWindowShouldClose(window))
     shader.setMat4("projection", projection);
     shader.setVec3("viewPos", cam->transform.position);
 
-    // Загружаем все источники света
     UploadLightsToShader(shader);
 
-    // Рендерим все объекты
     for (auto obj : GetSceneObjects()) {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, obj->transform.position);
-        model = glm::rotate(model, glm::radians(obj->transform.rotation.x), glm::vec3(1,0,0));
-        model = glm::rotate(model, glm::radians(obj->transform.rotation.y), glm::vec3(0,1,0));
-        model = glm::rotate(model, glm::radians(obj->transform.rotation.z), glm::vec3(0,0,1));
-        model = glm::scale(model, obj->transform.scale);
-        shader.setMat4("model", model);
 
-        // Если объект имеет материал с текстурой
-        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID); // textureID должен быть в LoadTexture
-            shader.setInt("material.diffuse", 0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
-            shader.setInt("material.specular", 1);
-        }
+    shader.setMat4("model", obj->transform.GetMatrix());
 
-        PointEngine::DrawAll(shader.ID, VAO);
+    if (auto mesh = dynamic_cast<Mesh*>(obj)) {
 
-        // Рисуем объект
-        obj->Draw(shader.ID, 0); // VAO у Mesh должен быть внутри Draw()
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+        shader.setInt("material.diffuse", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+        shader.setInt("material.specular", 1);
+
+        mesh->Draw(shader.ID);
     }
+}
+
 
     glfwSwapBuffers(window);
     glfwPollEvents();

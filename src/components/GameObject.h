@@ -28,7 +28,6 @@ public:
 
     virtual void Start();
     virtual void Update();
-    virtual void Draw(unsigned int shaderProgram, unsigned int VAO);
 };
 
 // Scene management functions

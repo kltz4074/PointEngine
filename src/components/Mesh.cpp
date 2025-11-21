@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "GameObject.h"
 #include <iostream>
 
 namespace PointEngine {
@@ -29,11 +30,14 @@ void Material::LoadTexture() {
     stbi_image_free(data);
 }
 
-void Mesh::Draw(GLuint shaderID, GLuint VAO) {
-    // VAO должен быть привязан заранее или внутри Mesh
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // 36 для куба
+void Mesh::Draw(GLuint shaderID) {
+    glBindVertexArray(model.VAO);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, material.textureID);
+
+    glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
 }
-
 } // namespace PointEngine

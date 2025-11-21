@@ -25,7 +25,6 @@ namespace {
 
     std::string wallTexture = "resources/Textures/container.jpg";
     std::string brickTexture = "resources/Textures/wall.jpg";
-    Model model;
 }
 
 namespace PointEngine {
@@ -56,9 +55,12 @@ namespace PointEngine {
         AddPointLight(pointLight2);
         // === Объекты ===
         cube = new Mesh;
-        cube->transform.position = { 1, 0, 0 };
-        cube->material.texturePath = wallTexture;
+        cube->transform.position = { 1, -2, 0 };
+        cube->material.texturePath = "resources/Textures/cucumber.jpg";
+        cube->material.shininess = 10;
         cube->material.LoadTexture();
+        cube->model.loadOBJ("resources/Models/backpack/backpack.obj");
+        cube->model.setupMesh();
         AddGameObject(cube);
 
         cube2 = new Mesh;
@@ -69,8 +71,6 @@ namespace PointEngine {
         AddGameObject(cube2);
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
-
-        model.something("resources/Models/backpack/backpack.obj");
         // Вызов Start() у всех объектов
         for (auto obj : GetSceneObjects()) obj->Start();
     }
@@ -80,9 +80,6 @@ namespace PointEngine {
 
         for (auto obj : GetSceneObjects()) obj->Update();
 
-        if (cube) {
-            cube->transform.rotation.y += 20.0f * GetDeltaTime();
-        }
     }
 
     void End() {

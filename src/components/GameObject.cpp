@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <glad/glad.h>
 #include <vector>
-
+#include "Mesh.h"
 namespace PointEngine {
 
 Transform::Transform()
@@ -27,22 +27,18 @@ void GameObject::Start() {}
 
 void GameObject::Update() {}
 
-void GameObject::Draw(unsigned int shaderProgram, unsigned int VAO) {
-    unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-    glm::mat4 model = transform.GetMatrix();
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-}
-
 void AddGameObject(GameObject* obj) {
     sceneObjects.push_back(obj);
 }
 
-void DrawAll(unsigned int shaderProgram, unsigned int VAO) {
-    for (auto obj : sceneObjects)
-        obj->Draw(shaderProgram, VAO);
+void DrawAll(unsigned int shaderProgram) {
+    for (auto obj : sceneObjects) {
+        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
+            mesh->Draw(shaderProgram);
+        }
+    }
 }
+
 
 // even more cool stuff broh
 void RemoveObjs() {

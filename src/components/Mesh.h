@@ -5,7 +5,7 @@
 #include <string>
 #include <glad/glad.h>
 #include "../core/stb_image.h"
-
+#include "Model.h"
 namespace PointEngine {
 
 struct Material {
@@ -19,8 +19,9 @@ struct Material {
 class Mesh : public GameObject {
 public:
     Material material;
-    
-    void Draw(GLuint shaderID, GLuint VAO); // каждый Mesh умеет рисовать себя
+    Model model;
+
+    void Draw(GLuint shaderID); // каждый Mesh умеет рисовать себя
 };
 
 } // namespace PointEngine
