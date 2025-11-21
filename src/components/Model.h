@@ -21,6 +21,8 @@ public:
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
     GLuint VAO, VBO, EBO;
+    bool ModelLoaded = false;
+
     void loadOBJ(const std::string& ObjPath) {
         rapidobj::Result result = rapidobj::ParseFile(ObjPath);
         rapidobj::Triangulate(result);
@@ -67,6 +69,7 @@ public:
         }
 
         std::cout << "Loaded verts: " << vertices.size() << "\n";
+        ModelLoaded = true;
     }
 
     void setupMesh() {

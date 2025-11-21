@@ -108,7 +108,7 @@ int main()
     double now;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -117,7 +117,6 @@ int main()
     
     Start();
 
-    // --- внутри main(), после Start() ---
 while (!glfwWindowShouldClose(window))
 {
     now = glfwGetTime();
@@ -134,24 +133,20 @@ while (!glfwWindowShouldClose(window))
         std::cout << "FPS: " << fps << std::endl;
     }
 
-    // Ввод и мышь
     glfwSetCursorPosCallback(window, mouse_callback);
     ProcessInput(window);
     Update();
 
-    // Очистка экрана
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
 
-    // Матрицы камеры
     Camera* cam = GetUserCamera();
     glm::mat4 view = cam->GetViewMatrix();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
-    // Активируем шейдер
     shader.use();
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);

@@ -53,9 +53,9 @@ namespace PointEngine {
         );
         AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
-        // === Объекты ===
+
         cube = new Mesh;
-        cube->transform.position = { 1, -2, 0 };
+        cube->transform.position = { 1, 0, 0 };
         cube->material.texturePath = "resources/Textures/cucumber.jpg";
         cube->material.shininess = 10;
         cube->material.LoadTexture();
@@ -71,7 +71,7 @@ namespace PointEngine {
         AddGameObject(cube2);
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
-        // Вызов Start() у всех объектов
+        
         for (auto obj : GetSceneObjects()) obj->Start();
     }
 
@@ -79,7 +79,7 @@ namespace PointEngine {
         forward = userCamera->GetForwardVector();
 
         for (auto obj : GetSceneObjects()) obj->Update();
-
+        cube->transform.rotation.x += 0.5f * GetDeltaTime();
     }
 
     void End() {
@@ -98,7 +98,7 @@ namespace PointEngine {
         }
 
         float xoffset = x - lastX;
-        float yoffset = lastY - y; // переворот оси Y
+        float yoffset = lastY - y;
         lastX = x;
         lastY = y;
 
@@ -108,7 +108,6 @@ namespace PointEngine {
         yaw += xoffset;
         pitch += yoffset;
 
-        // ограничиваем pitch
         if (pitch > 89.0f) pitch = 89.0f;
         if (pitch < -89.0f) pitch = -89.0f;
 

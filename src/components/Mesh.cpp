@@ -31,13 +31,28 @@ void Material::LoadTexture() {
 }
 
 void Mesh::Draw(GLuint shaderID) {
-    glBindVertexArray(model.VAO);
+    if (model.ModelLoaded) {
+        glBindVertexArray(model.VAO);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, material.textureID);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, material.textureID);
 
-    glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
 
-    glBindVertexArray(0);
+        glBindVertexArray(0);
+    } else {
+        model.loadOBJ("resources/Models/DefaultModel/Cube.obj");
+        model.setupMesh();
+        glBindVertexArray(model.VAO);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, material.textureID);
+
+        glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+
+        std::cout << "Model was loaded!" << std::endl;
+    }
 }
 } // namespace PointEngine
