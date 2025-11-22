@@ -53,25 +53,30 @@ jobs:
         run: cmake --build build --config Release --parallel
 
       # ------------------------
-      # Upload artifacts
+      # Prepare artifact folder
       # ------------------------
-      - name: Upload Windows artifact
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: PointEngine-windows
-          path: build/Release/PointEngine.exe
+      - name: Prepare artifact folder
+        run: |
+          mkdir artifact
 
-      - name: Upload Linux artifact
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: PointEngine-linux
-          path: build/PointEngine
+          # Windows — exe в Release
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp build/Release/PointEngine.exe artifact/
+          fi
 
-      - name: Upload macOS artifact
-        if: matrix.os == 'macos-latest'
+          # Linux & macOS — бинарник в build/
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ] || [ "${{ matrix.os }}" = "macos-latest" ]; then
+            cp build/PointEngine artifact/
+          fi
+
+          # Копируем ресурсы
+          cp -r resources artifact/resources
+
+      # ------------------------
+      # Upload combined artifacts
+      # ------------------------
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PointEngine-macos
-          path: build/PointEngine
+          name: PointEngine-${{ matrix.os }}
+          path: artifact
