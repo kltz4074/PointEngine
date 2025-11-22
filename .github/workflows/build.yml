@@ -15,20 +15,19 @@ jobs:
 
     steps:
       # ------------------------
-      # Checkout repo
+      # Checkout repository
       # ------------------------
       - name: Checkout repository
         uses: actions/checkout@v3
 
       # ------------------------
-      # Dependencies per OS
+      # Install dependencies per OS
       # ------------------------
       - name: Install deps on Ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake
-          # X11 + OpenGL deps for GLFW
           sudo apt install -y xorg-dev libgl1-mesa-dev
 
       - name: Install deps on macOS
@@ -37,11 +36,10 @@ jobs:
 
       - name: Install deps on Windows
         if: matrix.os == 'windows-latest'
-        run: |
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
       # ------------------------
-      # Configure
+      # Configure CMake
       # ------------------------
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -53,27 +51,37 @@ jobs:
         run: cmake --build build --config Release --parallel
 
       # ------------------------
-      # Prepare artifact folder
+      # Prepare artifact for Windows
       # ------------------------
-      - name: Prepare artifact folder
+      - name: Prepare Windows artifact
+        if: matrix.os == 'windows-latest'
         run: |
           mkdir artifact
+          copy build\Release\PointEngine.exe artifact\
+          xcopy /E /I resources artifact\resources
 
-          # Windows — exe в Release
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            cp build/Release/PointEngine.exe artifact/
-          fi
-
-          # Linux & macOS — бинарник в build/
-          if [ "${{ matrix.os }}" = "ubuntu-latest" ] || [ "${{ matrix.os }}" = "macos-latest" ]; then
-            cp build/PointEngine artifact/
-          fi
-
-          # Копируем ресурсы
+      # ------------------------
+      # Prepare artifact for Linux
+      # ------------------------
+      - name: Prepare Linux artifact
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir artifact
+          cp build/PointEngine artifact/
           cp -r resources artifact/resources
 
       # ------------------------
-      # Upload combined artifacts
+      # Prepare artifact for macOS
+      # ------------------------
+      - name: Prepare macOS artifact
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir artifact
+          cp build/PointEngine artifact/
+          cp -r resources artifact/resources
+
+      # ------------------------
+      # Upload artifact
       # ------------------------
       - name: Upload artifact
         uses: actions/upload-artifact@v4
