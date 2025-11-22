@@ -1,4 +1,4 @@
-name: Build C++ Project
+name: Build PointEngine
 
 on:
   push:
@@ -6,30 +6,68 @@ on:
 
 jobs:
   build:
-
+    name: Build on ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Install dependencies (Linux)
+      # --------------------------
+      # downloading CMAKE + C++ compilators
+      # --------------------------
+
+      - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt update && sudo apt install -y cmake g++ make
-
-      - name: Install dependencies (Windows)
-        if: matrix.os == 'windows-latest'
-        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: brew install cmake
 
-      - name: Configure with CMake
-        run: cmake -B build
+      - name: Install dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          choco install ninja -y
+
+      # --------------------------
+      # build
+      # --------------------------
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release -j 4
+        run: cmake --build build --config Release --parallel
+
+      # --------------------------
+      # Artifacts
+      # --------------------------
+
+      - name: Upload artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PointEngine-windows
+          path: build/Release/PointEngine.exe
+
+      - name: Upload artifact (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PointEngine-linux
+          path: build/PointEngine
+
+      - name: Upload artifact (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PointEngine-macos
+          path: build/PointEngine
