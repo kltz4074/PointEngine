@@ -65,7 +65,7 @@ namespace PointEngine {
         AddGameObject(pickle);
 
         plane = new Mesh;
-        plane->transform.position = { 0, -2, 0 };
+        plane->transform.position = { 0, -10, 0 };
         plane->transform.scale = { 20, 0.1, 20 };
         plane->material.texturePath = brickTexture;
         plane->material.LoadTexture();
