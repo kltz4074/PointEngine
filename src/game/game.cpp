@@ -19,8 +19,8 @@ namespace {
     bool CursorEnabled = true;
     glm::vec3 forward;
 
-    Mesh* cube = nullptr;
-    Mesh* cube2 = nullptr;
+    Mesh* pickle = nullptr;
+    Mesh* plane = nullptr;
     Camera* userCamera = nullptr;
 
     std::string wallTexture = "resources/Textures/container.jpg";
@@ -54,21 +54,22 @@ namespace PointEngine {
         AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
 
-        cube = new Mesh;
-        cube->transform.position = { 1, 0, 0 };
-        cube->material.texturePath = "resources/Textures/cucumber.jpg";
-        cube->material.shininess = 10;
-        cube->material.LoadTexture();
-        cube->model.loadOBJ("resources/Models/backpack/backpack.obj");
-        cube->model.setupMesh();
-        AddGameObject(cube);
+        pickle = new Mesh;
+        pickle->transform.position = { 1, 0, 0 };
+        pickle->transform.scale *= 0.5;
+        pickle->material.texturePath = "resources/Textures/cucumber.jpg";
+        pickle->material.shininess = 10;
+        pickle->material.LoadTexture();
+        pickle->model.loadOBJ("resources/Models/DefaultModel/Pickle.obj");
+        pickle->model.setupMesh();
+        AddGameObject(pickle);
 
-        cube2 = new Mesh;
-        cube2->transform.position = { 0, -2, 0 };
-        cube2->transform.scale = { 20, 1, 20 };
-        cube2->material.texturePath = brickTexture;
-        cube2->material.LoadTexture();
-        AddGameObject(cube2);
+        plane = new Mesh;
+        plane->transform.position = { 0, -2, 0 };
+        plane->transform.scale = { 20, 0.1, 20 };
+        plane->material.texturePath = brickTexture;
+        plane->material.LoadTexture();
+        AddGameObject(plane);
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
         
@@ -79,12 +80,12 @@ namespace PointEngine {
         forward = userCamera->GetForwardVector();
 
         for (auto obj : GetSceneObjects()) obj->Update();
-        cube->transform.rotation.x += 0.5f * GetDeltaTime();
+        pickle->transform.rotation.y += 0.5f * GetDeltaTime();
     }
 
     void End() {
         RemoveObjs();
-        std::cout << "game ended :<\n";
+        std::cout << "game ended :</n";
     }
 
     void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
