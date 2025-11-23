@@ -66,7 +66,11 @@ Releases & Demo
 ---------------
 Prebuilt engine releases and demo games are available in the repository Releases tab. Demo video:
 
-https://github.com/user-attachments/assets/4fe129e2-63c0-4b59-863f-967722da47e7
+
+
+https://github.com/user-attachments/assets/a6548f25-d2e9-48bc-89d6-7fbd9abdbbe0
+
+
 
 Getting started
 ---------------
@@ -277,6 +281,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
