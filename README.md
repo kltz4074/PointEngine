@@ -13,13 +13,8 @@ PointEngine is a lightweight, open-source 3D engine written in C++ using OpenGL.
 
 Contents
 - About
-- Features
-- Benchmarks
-- Releases / Demo
 - Getting started
-- Example usage
 - Roadmap
-- Contributing
 - License
 - Author & Contact
 
@@ -81,6 +76,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
