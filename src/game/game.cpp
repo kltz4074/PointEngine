@@ -1,4 +1,5 @@
 #include "game.h"
+#include "components/GameObject.h"
 #include "engine.h"
 #include "../components/LightManager.h"
 #include <iostream>
@@ -21,6 +22,7 @@ namespace {
 
     Mesh* pickle = nullptr;
     Mesh* plane = nullptr;
+    Mesh* city = nullptr;
     Camera* userCamera = nullptr;
 
     std::string wallTexture = "resources/Textures/container.jpg";
@@ -47,7 +49,7 @@ namespace PointEngine {
 
         auto* dirLight = new DirectionalLight(
             glm::vec3(-0.2f, -1.0f, -0.3f),
-            glm::vec3(0.01f),
+            glm::vec3(0.09f),
             glm::vec3(0.1f),
             glm::vec3(0.5f)
         );
@@ -55,7 +57,7 @@ namespace PointEngine {
         AddPointLight(pointLight2);
 
         pickle = new Mesh;
-        pickle->transform.position = { 1, 0, 0 };
+        pickle->transform.position = { 1, 10, 0 };
         pickle->transform.scale *= 0.5;
         pickle->material.texturePath = "resources/Textures/cucumber.jpg";
         pickle->material.shininess = 10;
@@ -70,6 +72,16 @@ namespace PointEngine {
         plane->material.texturePath = brickTexture;
         plane->material.LoadTexture();
         AddGameObject(plane);
+
+    
+        city = new Mesh;
+        city->transform.position = { 1, 0, 0 };
+        city->transform.scale *= 5;
+        city->material.texturePath = "resources/Models/xdlol/uwu.png";
+        city->material.LoadTexture();
+        city->model.loadOBJ("resources/Models/xdlol/uwu.obj");
+        city->model.setupMesh();
+        AddGameObject(city); 
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
         

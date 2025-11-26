@@ -145,7 +145,7 @@ while (!glfwWindowShouldClose(window))
 
     Camera* cam = GetUserCamera();
     glm::mat4 view = cam->GetViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
 
     shader.use();
     shader.setMat4("view", view);
