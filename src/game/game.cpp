@@ -77,7 +77,7 @@ namespace PointEngine {
         city = new Mesh;
         city->transform.position = { 1, 0, 0 };
         city->transform.scale *= 5;
-        city->material.texturePath = "resources/Models/xdlol/uwu.png";
+        city->material.texturePath = "resources/Models/xdlol/texture4k.png";
         city->material.LoadTexture();
         city->model.loadOBJ("resources/Models/xdlol/uwu.obj");
         city->model.setupMesh();
