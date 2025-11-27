@@ -9,12 +9,6 @@
  * Include this header to use the engine in other apps
  */
 
-#include "PointEngine/GameObject.h"
-#include "PointEngine/Camera.h"
-#include "PointEngine/Mesh.h"
-#include "PointEngine/PointLight.h"
-#include "PointEngine/Cube.h"
-
 namespace PointEngine {
 
 /**
