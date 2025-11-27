@@ -7,7 +7,7 @@
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-9cf.svg)]()
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-orange.svg)]()
 
-PointEngine is a lightweight, open-source 3D engine written in C++ using OpenGL. PointEngine is in the very early stages of development and aims to be fast, extensible, and scriptable (Python support planned).
+PointEngine is a lightweight, open-source 3D engine written in C++ using OpenGL. PointEngine is in the very early stages of development and aims to be fast, extensible, and scriptable (lua support planned).
 
 ---
 
@@ -63,7 +63,7 @@ Roadmap
 (early — will be expanded)
 - [x] Stabilize C++ core and public API
 - [ ] Photorealistic light system
-- [ ] Add Python scripting binding for game logic
+- [ ] Add Lua scripting binding for game logic
 - [ ] Add physics integration and basic particle/chemical reaction modules
 - [ ] Editor (PointEngineEditor) for scene building and asset management
 - [ ] Documentation site (GitHub Pages) and tutorials
@@ -76,6 +76,7 @@ PointEngine is released under the MIT License. See the LICENSE file for details.
 Author & Contact
 ----------------
 Author: [kltzqu](https://kltz4074.github.io/)
+
 
 
 
