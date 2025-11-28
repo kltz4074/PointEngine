@@ -44,7 +44,7 @@ namespace PointEngine {
         
 
         pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
-        pointLight->transform.position = { 0.0f, 1.0f, 0.0f };
+        pointLight2->transform.position = { 0.0f, 1.0f, 0.0f };
         AddPointLight(pointLight);
 
         auto* dirLight = new DirectionalLight(

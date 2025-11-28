@@ -117,71 +117,70 @@ int main()
     
     Start();
 
-while (!glfwWindowShouldClose(window))
-{
-    now = glfwGetTime();
-    SetDeltaTime(now - oldTimeSinceStart);
-    oldTimeSinceStart = now;
+    while (!glfwWindowShouldClose(window))
+    {
+        now = glfwGetTime();
+        SetDeltaTime(now - oldTimeSinceStart);
+        oldTimeSinceStart = now;
 
-    fpsTimer += GetDeltaTime();
-    frames++;
+        fpsTimer += GetDeltaTime();
+        frames++;
 
-    if (fpsTimer >= 1.0) {
-        fps = frames;
-        frames = 0;
-        fpsTimer = 0.0;
-        std::cout << "FPS: " << fps << std::endl;
+        if (fpsTimer >= 1.0) {
+            fps = frames;
+            frames = 0;
+            fpsTimer = 0.0;
+            std::cout << "FPS: " << fps << std::endl;
+        }
+
+        glfwSetCursorPosCallback(window, mouse_callback);
+        ProcessInput(window);
+        Update();
+
+        glClearColor(0.01, 0.01 ,0.01, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        Camera* cam = GetUserCamera();
+        glm::mat4 view = cam->GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
+
+        shader.use();
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
+        shader.setVec3("viewPos", cam->transform.position);
+
+        UploadLightsToShader(shader);
+
+        for (auto obj : GetSceneObjects()) {
+
+        shader.setMat4("model", obj->transform.GetMatrix());
+
+        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+            shader.setInt("material.diffuse", 0);
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+            shader.setInt("material.specular", 1);
+
+            mesh->Draw(shader.ID);
+        }
     }
-
-    glfwSetCursorPosCallback(window, mouse_callback);
-    ProcessInput(window);
-    Update();
-
-    glClearColor(0.01, 0.01 ,0.01, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-
-    Camera* cam = GetUserCamera();
-    glm::mat4 view = cam->GetViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
-
-    shader.use();
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-    shader.setVec3("viewPos", cam->transform.position);
-
-    UploadLightsToShader(shader);
-
-    for (auto obj : GetSceneObjects()) {
-
-    shader.setMat4("model", obj->transform.GetMatrix());
-
-    if (auto mesh = dynamic_cast<Mesh*>(obj)) {
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
-        shader.setInt("material.diffuse", 0);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
-        shader.setInt("material.specular", 1);
-
-        mesh->Draw(shader.ID);
-    }
-}
 
 
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
 
-
     End();
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shader.ID);
+    //glDeleteVertexArrays(1, &VAO);
+    //glDeleteBuffers(1, &VBO);
+    //glDeleteProgram(shader.ID);
 
     
     
