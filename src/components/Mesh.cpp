@@ -5,8 +5,8 @@
 namespace PointEngine {
 
 void Material::LoadTexture() {
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &DiffuseTextureID);
+    glBindTexture(GL_TEXTURE_2D, DiffuseTextureID);
 
     // Настройка фильтров и повторения
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -30,29 +30,25 @@ void Material::LoadTexture() {
     stbi_image_free(data);
 }
 
-void Mesh::Draw(GLuint shaderID) {
+void Mesh::Draw(Shader shader) {
     if (model.ModelLoaded) {
         glBindVertexArray(model.VAO);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.textureID);
+        glBindTexture(GL_TEXTURE_2D, material.DiffuseTextureID);
 
         glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
     } else {
-        model.loadOBJ("resources/Models/DefaultModel/Cube.obj");
-        model.setupMesh();
         glBindVertexArray(model.VAO);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.textureID);
+        glBindTexture(GL_TEXTURE_2D, material.DiffuseTextureID);
 
         glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
-
-        std::cout << "Model was loaded!" << std::endl;
     }
 }
 } // namespace PointEngine

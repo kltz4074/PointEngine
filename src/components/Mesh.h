@@ -5,12 +5,14 @@
 #include <string>
 #include <glad/glad.h>
 #include "../core/stb_image.h"
+#include "../core/shader.h"
 #include "Model.h"
 namespace PointEngine {
 
 struct Material {
     std::string texturePath;
-    GLuint textureID = 0; // ID текстуры для OpenGL
+    GLuint DiffuseTextureID = 0;
+    std::vector<GLuint> textures;
     float shininess = 32.0f;
 
     void LoadTexture(); // теперь создаёт textureID
@@ -21,7 +23,7 @@ public:
     Material material;
     Model model;
 
-    void Draw(GLuint shaderID); // каждый Mesh умеет рисовать себя
+    void Draw(Shader shader); // каждый Mesh умеет рисовать себя
 };
 
 } // namespace PointEngine

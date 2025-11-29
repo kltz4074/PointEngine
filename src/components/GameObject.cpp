@@ -31,10 +31,10 @@ void AddGameObject(GameObject* obj) {
     sceneObjects.push_back(obj);
 }
 
-void DrawAll(unsigned int shaderProgram) {
+void DrawAll(Shader shader) {
     for (auto obj : sceneObjects) {
         if (auto mesh = dynamic_cast<Mesh*>(obj)) {
-            mesh->Draw(shaderProgram);
+            mesh->Draw(shader);
         }
     }
 }

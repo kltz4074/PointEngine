@@ -23,6 +23,9 @@ public:
     GLuint VAO, VBO, EBO;
     bool ModelLoaded = false;
 
+    GLuint DefaultVAO, DefaultVBO, DefaultEBO;
+
+
     void loadOBJ(const std::string& ObjPath) {
         rapidobj::Result result = rapidobj::ParseFile(ObjPath);
         rapidobj::Triangulate(result);

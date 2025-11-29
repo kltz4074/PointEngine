@@ -10,9 +10,9 @@
 #include "core/stb_image.h"
 #include "components/GameObject.h"
 #include "components/Camera.h"
-#include "components/Meshes/Cube.h"
 #include "game/game.h"
 #include "components/LightManager.h"
+#include "components/Meshes/Cube.h"
 
 using namespace PointEngine;
 
@@ -22,6 +22,7 @@ namespace {
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
     bool VsyncEnabled = false;
+    unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
 }
 
 // Forward declarations
@@ -71,32 +72,28 @@ int main()
 
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
 
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    
+    glGenVertexArrays(1, &DefaultVAO);
+    glGenBuffers(1, &DefaultVBO);
+    glGenBuffers(1, &DefaultEBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(DefaultVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, DefaultVBO);
     glBufferData(GL_ARRAY_BUFFER, CubeVerticesSize * sizeof(float), CubeVertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, DefaultEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, CubeIndicesSize * sizeof(unsigned int), CubeIndices, GL_STATIC_DRAW);
 
-    // 0: position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // 1: normal
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // 2: uv
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-
-
+    
     glEnable(GL_DEPTH_TEST);
     double oldTimeSinceStart = 0.0;
 
@@ -116,6 +113,7 @@ int main()
     
     
     Start();
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -161,14 +159,14 @@ int main()
         if (auto mesh = dynamic_cast<Mesh*>(obj)) {
 
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
             shader.setInt("material.diffuse", 0);
 
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.textureID);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
             shader.setInt("material.specular", 1);
 
-            mesh->Draw(shader.ID);
+            mesh->Draw(shader);
         }
     }
 
