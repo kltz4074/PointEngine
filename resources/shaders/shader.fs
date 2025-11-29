@@ -54,7 +54,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     
     float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance);
     
     vec3 ambient = light.ambient * vec3(texture(diffuseMap, TexCoords));
     vec3 diffuse = light.diffuse * diff * vec3(texture(diffuseMap, TexCoords));
@@ -77,6 +77,6 @@ void main()
         result += CalcDirLight(dirLights[i], norm, viewDir);
     for (int i = 0; i < numPointLights; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-
-    FragColor = vec4(result, 1.0);
+    float gamma = 2.2;
+    FragColor = vec4(result, 1.0/gamma);
 }

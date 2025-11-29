@@ -95,6 +95,8 @@ int main()
     glEnableVertexAttribArray(2);
     
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB);
+    
     double oldTimeSinceStart = 0.0;
 
     double fpsTimer = 0.0;

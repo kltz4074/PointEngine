@@ -39,17 +39,17 @@ namespace PointEngine {
         userCamera->transform.position = { 0, 0, 3 };
         userCamera->transform.rotation = { 0, 0, 0 };
 
-        auto* pointLight = new PointLight(glm::vec3(1.0f), 1.0f);
+        //auto* pointLight = new PointLight(glm::vec3(1.0f), 1.0f);
         auto* pointLight2 = new PointLight(glm::vec3(1.0f), 1.0f);
         
 
-        pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
+        //pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
         pointLight2->transform.position = { 0.0f, 1.0f, 0.0f };
-        AddPointLight(pointLight);
+        //AddPointLight(pointLight);
 
         auto* dirLight = new DirectionalLight(
             glm::vec3(-0.2f, -1.0f, -0.3f),
-            glm::vec3(0.09f),
+            glm::vec3(0.1f),
             glm::vec3(0.1f),
             glm::vec3(0.5f)
         );
