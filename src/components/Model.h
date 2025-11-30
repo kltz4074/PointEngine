@@ -25,7 +25,10 @@ public:
 
     GLuint DefaultVAO, DefaultVBO, DefaultEBO;
 
-
+    void LoadModel(const std::string& ObjPath) {
+        LoadModel(ObjPath);
+        setupMesh();
+    }
     void loadOBJ(const std::string& ObjPath) {
         rapidobj::Result result = rapidobj::ParseFile(ObjPath);
         rapidobj::Triangulate(result);

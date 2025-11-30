@@ -142,7 +142,7 @@ int main()
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-
+        
         Camera* cam = GetUserCamera();
         glm::mat4 view = cam->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
@@ -181,8 +181,6 @@ int main()
     //glDeleteVertexArrays(1, &VAO);
     //glDeleteBuffers(1, &VBO);
     //glDeleteProgram(shader.ID);
-
-    
     
     glfwTerminate();
     return 0;

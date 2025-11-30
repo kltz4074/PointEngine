@@ -23,6 +23,8 @@ namespace {
     Mesh* pickle = nullptr;
     Mesh* plane = nullptr;
     Mesh* city = nullptr;
+    Mesh* SunDirModel = nullptr;
+
     Camera* userCamera = nullptr;
 
     std::string wallTexture = "resources/Textures/container.jpg";
@@ -53,15 +55,15 @@ namespace PointEngine {
             glm::vec3(0.01f),
             glm::vec3(0.1f)
         );
+        dirLight->transform.position = {0, 1, 0};
         AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
 
         pickle = new Mesh;
         pickle->transform.position = { 1, 10, 0 };
         pickle->transform.scale *= 0.5;
-        pickle->material.texturePath = "resources/Textures/cucumber.jpg";
         pickle->material.shininess = 10;
-        pickle->material.LoadTexture();
+        pickle->material.LoadTexture("resources/Textures/cucumber.jpg");
         pickle->model.loadOBJ("resources/Models/DefaultModel/Pickle.obj");
         pickle->model.setupMesh();
         AddGameObject(pickle);
@@ -69,19 +71,18 @@ namespace PointEngine {
         plane = new Mesh;
         plane->transform.position = { 0, -10, 0 };
         plane->transform.scale = { 20, 0.1, 20 };
-        plane->material.texturePath = brickTexture;
-        plane->material.LoadTexture();
+        plane->material.LoadTexture(brickTexture);
         AddGameObject(plane);
 
     
         city = new Mesh;
         city->transform.position = { 1, 0, 0 };
         city->transform.scale *= 5;
-        city->material.texturePath = "resources/Models/xdlol/texture4k.png";
-        city->material.LoadTexture();
+        city->material.LoadTexture("resources/Models/xdlol/texture4k.png");
         city->model.loadOBJ("resources/Models/xdlol/uwu.obj");
         city->model.setupMesh();
         AddGameObject(city); 
+
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
         
