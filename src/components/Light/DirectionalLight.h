@@ -17,7 +17,7 @@ public:
     float linear;
     float quadratic;
     
-    DirectionalLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float constAtt = 1.0f, float linAtt = 0.09f, float quadAtt = 0.032f);
+    DirectionalLight(glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float constAtt = 1.0f, float linAtt = 0.09f, float quadAtt = 0.032f);
 };
 
 } // namespace PointEngine

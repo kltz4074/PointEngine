@@ -30,7 +30,7 @@ void UploadLightsToShader(const Shader& shader) {
     int dirIndex = 0;
     for (auto light : directionalLights) {
         std::string base = "dirLights[" + std::to_string(dirIndex) + "]";
-        shader.setVec3(base + ".direction", light->direction);
+        shader.setVec3(base + ".direction", light->transform.rotation);
         shader.setVec3(base + ".ambient", light->ambient);
         shader.setVec3(base + ".diffuse", light->diffuse);
         shader.setVec3(base + ".specular", light->specular);

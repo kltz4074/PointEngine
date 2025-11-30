@@ -50,12 +50,11 @@ namespace PointEngine {
         //AddPointLight(pointLight);
 
         auto* dirLight = new DirectionalLight(
-            glm::vec3(-0.2f, -1.0f, -0.3f),
             glm::vec3(0.01f),
             glm::vec3(0.01f),
             glm::vec3(0.1f)
         );
-        dirLight->transform.position = {0, 1, 0};
+        dirLight->transform.rotation = {122.673f, -43.8395f, -71.415f};
         AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
 
@@ -83,6 +82,12 @@ namespace PointEngine {
         city->model.setupMesh();
         AddGameObject(city); 
 
+        SunDirModel = new Mesh;
+        SunDirModel->transform = dirLight->transform;
+        SunDirModel->material.LoadTexture("resources/Textures/uvSun.png");
+        SunDirModel->model.loadOBJ("resources/Models/DefaultModel/SunDir/SunDir.obj");
+        SunDirModel->model.setupMesh();
+        AddGameObject(SunDirModel); 
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
         

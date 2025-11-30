@@ -25,7 +25,7 @@ public:
 
     GLuint DefaultVAO, DefaultVBO, DefaultEBO;
 
-    void LoadModel(const std::string& ObjPath) {
+    inline void LoadModel(const std::string& ObjPath) {
         LoadModel(ObjPath);
         setupMesh();
     }
