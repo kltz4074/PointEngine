@@ -44,7 +44,6 @@ namespace PointEngine {
         //auto* pointLight = new PointLight(glm::vec3(1.0f), 1.0f);
         auto* pointLight2 = new PointLight(glm::vec3(1.0f), 1.0f);
         
-
         //pointLight->transform.position = { 0.0f, 1.0f, 2.0f };
         pointLight2->transform.position = { 0.0f, 1.0f, 0.0f };
         //AddPointLight(pointLight);
@@ -55,6 +54,7 @@ namespace PointEngine {
             glm::vec3(0.1f)
         );
         dirLight->transform.rotation = {122.673f, -43.8395f, -71.415f};
+        dirLight->transform.position.y += 20;
         AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
 
@@ -73,7 +73,6 @@ namespace PointEngine {
         plane->material.LoadTexture(brickTexture);
         AddGameObject(plane);
 
-    
         city = new Mesh;
         city->transform.position = { 1, 0, 0 };
         city->transform.scale *= 5;
@@ -90,7 +89,7 @@ namespace PointEngine {
         AddGameObject(SunDirModel); 
 
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
-        
+
         for (auto obj : GetSceneObjects()) obj->Start();
     }
 

@@ -22,6 +22,7 @@ namespace {
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
     bool VsyncEnabled = false;
+    bool AntiAliasing = true;
     unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
 }
 
@@ -45,6 +46,9 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (AntiAliasing) {
+        glfwWindowHint(GLFW_SAMPLES, 4);
+    }
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -96,7 +100,8 @@ int main()
     
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FRAMEBUFFER_SRGB);
-    
+    glEnable(GL_MULTISAMPLE);
+
     double oldTimeSinceStart = 0.0;
 
     double fpsTimer = 0.0;
@@ -105,14 +110,6 @@ int main()
     
     unsigned int texture;
     double now;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
     
     Start();
 
