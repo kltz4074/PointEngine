@@ -1,6 +1,5 @@
 #include <cstddef>
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -22,7 +21,7 @@ namespace {
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
     bool VsyncEnabled = false;
-    bool AntiAliasing = true;
+    bool AntiAliasing = false;
     unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
 }
 
@@ -47,18 +46,19 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     if (AntiAliasing) {
-        glfwWindowHint(GLFW_SAMPLES, 4);
+        glfwWindowHint(GLFW_SAMPLES, 8);
     }
+
+    
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "PointEngine", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "PointEngine", 0, NULL);
     GLFWimage PointIcon[1];
     PointIcon[0].pixels = stbi_load("resources/Icon.png", &PointIcon[0].width, &PointIcon[0].height, 0, 4);
     glfwSetWindowIcon(window, 1, PointIcon);
     stbi_image_free(PointIcon[0].pixels);
 
-    
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;

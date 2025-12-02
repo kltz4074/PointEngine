@@ -1,7 +1,9 @@
 #include "game.h"
+#include "GLFW/glfw3.h"
 #include "components/GameObject.h"
 #include "engine.h"
 #include "../components/LightManager.h"
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <glm/glm.hpp>
@@ -146,7 +148,7 @@ namespace PointEngine {
         float basicSpeed = 5.0f * GetDeltaTime();
         float runSpeed = 10.0f * GetDeltaTime();
         float speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? runSpeed : basicSpeed;
-
+        bool FullScreen = false;
         glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0, 1.0, 0.0)));
         glm::vec3 up = glm::normalize(glm::cross(right, forward));
 
@@ -162,6 +164,18 @@ namespace PointEngine {
             userCamera->transform.position.y -= speed;
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
             userCamera->transform.position.y += speed;
+
+        if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
+            FullScreen = !FullScreen;
+            const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            if (FullScreen) {
+                glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+            }
+            if (FullScreen == false) {
+                glfwIconifyWindow(window);
+            }
+        
+        }
 
         static bool escPressedLastFrame = false;
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
