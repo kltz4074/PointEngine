@@ -50,15 +50,6 @@ void SetDeltaTime(double dt);
 // Source - https://stackoverflow.com/q
 // Posted by Swatcat, modified by community. See post 'Timeline' for change history
 // Retrieved 2025-12-02, License - CC BY-SA 3.0
-inline void window(GLFWwindow* oldWindow, bool FullScreen, GLFWmonitor* monitor, int width, int height, char* title) {
-    glfwDestroyWindow(oldWindow);
-    if (!FullScreen) {
-        GLFWwindow* window = glfwCreateWindow(width, height, title, 0, 0);
-    } else {
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, title, monitor, 0);
-    }
-}
 } // namespace PointEngine
 
 #endif // ENGINE_H
