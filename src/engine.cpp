@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "engine.h"
+#include "GLFW/glfw3.h"
 #include "core/shader.h"
 #include "core/stb_image.h"
 #include "components/GameObject.h"
@@ -37,6 +38,9 @@ namespace PointEngine {
     void SetDeltaTime(double dt) {
         g_deltaTime = dt;
     }
+
+    const unsigned int WIDTH = 800;
+    const unsigned int HEIGHT = 600;
 }
 
 int main()
@@ -53,7 +57,7 @@ int main()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "PointEngine", 0, NULL);
+    GLFWwindow* window = glfwCreateWindow(PointEngine::WIDTH, PointEngine::HEIGHT, "PointEngine", 0, NULL);
     GLFWimage PointIcon[1];
     PointIcon[0].pixels = stbi_load("resources/Icon.png", &PointIcon[0].width, &PointIcon[0].height, 0, 4);
     glfwSetWindowIcon(window, 1, PointIcon);
@@ -131,9 +135,9 @@ int main()
         }
 
         glfwSetCursorPosCallback(window, mouse_callback);
-        ProcessInput(window);
+        glfwSetKeyCallback(window, key_callback);
         Update();
-
+        ProcessInput(window);
         glClearColor(0.01, 0.01 ,0.01, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

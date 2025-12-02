@@ -31,6 +31,10 @@ namespace {
 
     std::string wallTexture = "resources/Textures/container.jpg";
     std::string brickTexture = "resources/Textures/wall.jpg";
+
+    bool FullScreen = false;
+    int windowPosX, windowPosY;
+    int windowWidth = 800, windowHeight = 600;
 }
 
 namespace PointEngine {
@@ -148,10 +152,11 @@ namespace PointEngine {
         float basicSpeed = 5.0f * GetDeltaTime();
         float runSpeed = 10.0f * GetDeltaTime();
         float speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? runSpeed : basicSpeed;
-        bool FullScreen = false;
         glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0, 1.0, 0.0)));
         glm::vec3 up = glm::normalize(glm::cross(right, forward));
 
+
+        
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             userCamera->transform.position += forward * speed;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -162,20 +167,47 @@ namespace PointEngine {
             userCamera->transform.position += right * speed;
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
             userCamera->transform.position.y -= speed;
+
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
             userCamera->transform.position.y += speed;
+    }
+    void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-        if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
+    
+        if (action == GLFW_PRESS && key == GLFW_KEY_F11) {
             FullScreen = !FullScreen;
-            const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
             if (FullScreen) {
-                glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
+                // Сохранение позиции и размера окна перед фуллскрином
+                glfwGetWindowPos(window, &windowPosX, &windowPosY);
+                glfwGetWindowSize(window, &windowWidth, &windowHeight);
+
+                const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+                glfwSetWindowMonitor(
+                    window,
+                    glfwGetPrimaryMonitor(),
+                    0, 0,
+                    mode->width, mode->height,
+                    mode->refreshRate
+                );
+
+                std::cout << "fullscreen enabled\n";
             }
-            if (FullScreen == false) {
-                glfwIconifyWindow(window);
+            else {
+                // Возврат окна в обычный режим
+                glfwSetWindowMonitor(
+                    window,
+                    nullptr,
+                    windowPosX, windowPosY,     // возвращаем старую позицию
+                    windowWidth, windowHeight, // возвращаем старый размер
+                    0
+                );
+
+                std::cout << "windowed mode restored\n";
             }
-        
         }
+
 
         static bool escPressedLastFrame = false;
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

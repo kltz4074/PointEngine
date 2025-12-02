@@ -18,6 +18,7 @@ void Update();
 void End();
 
 // Input processing
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void ProcessInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
