@@ -106,6 +106,19 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_MULTISAMPLE);
+    
+    unsigned int skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, CubeVerticesSize * sizeof(float), CubeVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glBindVertexArray(0);
+
+
 
     double oldTimeSinceStart = 0.0;
 
@@ -145,20 +158,32 @@ int main()
             std::cout << "FPS: " << fps << std::endl;
         }
 
-        glfwSetCursorPosCallback(window, mouse_callback);
-        glfwSetKeyCallback(window, key_callback);
-        Update();
-        ProcessInput(window);
-        glClearColor(0.01, 0.01 ,0.01, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         
         Camera* cam = GetUserCamera();
         glm::mat4 view = cam->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
+        glm::mat4 viewSky = glm::mat4(glm::mat3(view));
 
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetKeyCallback(window, key_callback);
+        
+        ProcessInput(window);
+        glClearColor(0.01, 0.01 ,0.01, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(GL_FALSE);
+        skyboxShader.use();
+        skyboxShader.setMat4("view", viewSky);
+        skyboxShader.setMat4("projection", projection);
+        glBindVertexArray(skyboxVAO);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDepthMask(GL_TRUE);
+        Update();
         shader.use();
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
@@ -168,26 +193,28 @@ int main()
 
         for (auto obj : GetSceneObjects()) {
 
-        shader.setMat4("model", obj->transform.GetMatrix());
+            shader.setMat4("model", obj->transform.GetMatrix());
 
-        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
+            if (auto mesh = dynamic_cast<Mesh*>(obj)) {
 
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
-            shader.setInt("material.diffuse", 0);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
+                shader.setInt("material.diffuse", 0);
 
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
-            shader.setInt("material.specular", 1);
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
+                shader.setInt("material.specular", 1);
 
-            mesh->Draw(shader);
+                mesh->Draw(shader);
+            }
         }
+        
+
+
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
-
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-}
 
     End();
     //glDeleteVertexArrays(1, &VAO);
