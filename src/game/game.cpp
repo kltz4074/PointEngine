@@ -60,13 +60,13 @@ namespace PointEngine {
             glm::vec3(0.1f)
         );
         dirLight->transform.rotation = {122.673f, -43.8395f, -71.415f};
-        dirLight->transform.position.y += 20;
+        dirLight->transform.position.y -= 20;
         AddDirectionalLight(dirLight);
         AddPointLight(pointLight2);
 
         pickle = new Mesh;
-        pickle->transform.position = { 1, 10, 0 };
-        pickle->transform.scale *= 0.5;
+        pickle->transform.position = { 1, 0.9, 0 };
+        pickle->transform.scale *= 0.02;
         pickle->material.shininess = 10;
         pickle->material.LoadTexture("resources/Textures/cucumber.jpg");
         pickle->model.loadOBJ("resources/Models/DefaultModel/Pickle.obj");
@@ -80,8 +80,8 @@ namespace PointEngine {
         AddGameObject(plane);
 
         city = new Mesh;
-        city->transform.position = { 1, 0, 0 };
-        city->transform.scale *= 5;
+        city->transform.position = { 1, 0.2, 0 };
+        city->transform.scale *= 0.2;
         city->material.LoadTexture("resources/Models/xdlol/texture4k.png");
         city->model.loadOBJ("resources/Models/xdlol/uwu.obj");
         city->model.setupMesh();
