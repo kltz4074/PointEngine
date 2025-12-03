@@ -1,0 +1,5 @@
+{
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}"
+}

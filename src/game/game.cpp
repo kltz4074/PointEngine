@@ -3,7 +3,6 @@
 #include "components/GameObject.h"
 #include "engine.h"
 #include "../components/LightManager.h"
-#include <cstddef>
 #include <iostream>
 #include <string>
 #include <glm/glm.hpp>
