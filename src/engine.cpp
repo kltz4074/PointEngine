@@ -13,6 +13,7 @@
 #include "game/game.h"
 #include "components/LightManager.h"
 #include "components/Meshes/Cube.h"
+#include "components/skybox.h"
 
 using namespace PointEngine;
 
@@ -79,7 +80,7 @@ int main()
     }
 
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
-
+    Shader skyboxShader("./resources/shaders/skybox/shader.vs", "./resources/shaders/skybox/shader.fs");
     
     glGenVertexArrays(1, &DefaultVAO);
     glGenBuffers(1, &DefaultVBO);
@@ -117,6 +118,16 @@ int main()
     
     Start();
 
+    std::vector<std::string> faces
+    {
+    "resources/Textures/skybox/right.jpg",
+    "resources/Textures/skybox/left.jpg",
+    "resources/Textures/skybox/top.jpg",
+    "resources/Textures/skybox/bottom.jpg",
+    "resources/Textures/skybox/front.jpg",
+    "resources/Textures/skybox/back.jpg"
+    };
+    unsigned int cubemapTexture = loadCubemap(faces);
 
     while (!glfwWindowShouldClose(window))
     {
