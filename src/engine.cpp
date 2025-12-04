@@ -23,7 +23,7 @@ namespace {
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
     bool VsyncEnabled = false;
-    bool AntiAliasing = false;
+    bool AntiAliasing = true;
     unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
 }
 
@@ -106,6 +106,10 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_MULTISAMPLE);
+    
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT3);
     
     unsigned int skyboxVAO, skyboxVBO;
     glGenVertexArrays(1, &skyboxVAO);

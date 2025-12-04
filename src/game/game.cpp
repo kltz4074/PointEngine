@@ -25,7 +25,7 @@ namespace {
     Mesh* plane = nullptr;
     Mesh* city = nullptr;
     Mesh* SunDirModel = nullptr;
-
+    Mesh* mikuPlush = nullptr;
     Camera* userCamera = nullptr;
 
     std::string wallTexture = "resources/Textures/container.jpg";
@@ -86,13 +86,13 @@ namespace PointEngine {
         city->model.setupMesh();
         AddGameObject(city); 
 
-        SunDirModel = new Mesh;
-        SunDirModel->transform = dirLight->transform;
-        SunDirModel->material.LoadTexture("resources/Textures/uvSun.png");
-        SunDirModel->model.loadOBJ("resources/Models/DefaultModel/SunDir/SunDir.obj");
-        SunDirModel->model.setupMesh();
-        AddGameObject(SunDirModel); 
-
+        mikuPlush = new Mesh;
+        mikuPlush->transform.position = {0, 0, 0};
+        mikuPlush->material.LoadTexture("resources/Models/miku/miku.png");
+        mikuPlush->model.loadOBJ("resources/Models/miku/miku.obj");
+        mikuPlush->model.setupMesh();
+        AddGameObject(mikuPlush); 
+        
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
 
         for (auto obj : GetSceneObjects()) obj->Start();
