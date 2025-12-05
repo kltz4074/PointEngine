@@ -73,7 +73,7 @@ namespace PointEngine {
         AddGameObject(pickle);
 
         plane = new Mesh;
-        plane->transform.position = { 0, -10, 0 };
+        plane->transform.position = { 0, -1, 0 };
         plane->transform.scale = { 20, 0.1, 20 };
         plane->material.LoadTexture(brickTexture);
         AddGameObject(plane);
@@ -87,7 +87,7 @@ namespace PointEngine {
         AddGameObject(city); 
 
         mikuPlush = new Mesh;
-        mikuPlush->transform.position = {0, 0, 0};
+        mikuPlush->transform.position = {0, 3, 0};
         mikuPlush->material.LoadTexture("resources/Models/miku/miku.png");
         mikuPlush->model.loadOBJ("resources/Models/miku/miku.obj");
         mikuPlush->model.setupMesh();
@@ -102,7 +102,9 @@ namespace PointEngine {
         forward = userCamera->GetForwardVector();
 
         for (auto obj : GetSceneObjects()) obj->Update();
+
         pickle->transform.rotation.y += 0.5f * GetDeltaTime();
+        mikuPlush->transform.rotation.y += 0.5f * GetDeltaTime();
     }
 
     void End() {
