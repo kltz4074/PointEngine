@@ -25,11 +25,15 @@ namespace {
     bool VsyncEnabled = false;
     bool AntiAliasing = true;
     unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
+    int width, height;
+
+   
 }
 
 // Forward declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
+inline void RenderScene(Shader shader);
+inline void RenderObjects(Shader shader);
 // Public API implementation
 namespace PointEngine {
     double GetDeltaTime() {
@@ -79,9 +83,6 @@ int main()
         return -1;
     }
 
-    Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
-    Shader skyboxShader("./resources/shaders/skybox/shader.vs", "./resources/shaders/skybox/shader.fs");
-    
     glGenVertexArrays(1, &DefaultVAO);
     glGenBuffers(1, &DefaultVBO);
     glGenBuffers(1, &DefaultEBO);
@@ -122,8 +123,43 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glBindVertexArray(0);
 
+    Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
+    Shader skyboxShader("./resources/shaders/skybox/shader.vs", "./resources/shaders/skybox/shader.fs");
+    
+    /*
+    Shader DepthShader("resources/shaders/light/shadow_mapping.vs", "resources/shaders/light/shadow_mapping.fs");
+    Shader debugDepthQuad("resources/shaders/light/shadowMapping/debug_quad/debug_quad.vs", "resources/shaders/light/shadowMapping/debug_quad/debug_quad.fs");
+    */
 
-
+    /*
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    
+    // create depth texture
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // shaders configuration uwu
+    shader.use();
+    shader.setInt("diffuseTexture", 0);
+    shader.setInt("shadowMap", 1);
+    debugDepthQuad.use();
+    debugDepthQuad.setInt("depthMap", 0);
+ */
     double oldTimeSinceStart = 0.0;
 
     double fpsTimer = 0.0;
@@ -162,7 +198,6 @@ int main()
             std::cout << "FPS: " << fps << std::endl;
         }
 
-        int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         
         Camera* cam = GetUserCamera();
@@ -176,8 +211,7 @@ int main()
         ProcessInput(window);
         glClearColor(0.01, 0.01 ,0.01, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
+        
         glDepthFunc(GL_LEQUAL);
         glDepthMask(GL_FALSE);
         skyboxShader.use();
@@ -187,34 +221,16 @@ int main()
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glDepthMask(GL_TRUE);
+        
         Update();
+        
         shader.use();
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
         shader.setVec3("viewPos", cam->transform.position);
 
         UploadLightsToShader(shader);
-
-        for (auto obj : GetSceneObjects()) {
-
-            shader.setMat4("model", obj->transform.GetMatrix());
-
-            if (auto mesh = dynamic_cast<Mesh*>(obj)) {
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
-                shader.setInt("material.diffuse", 0);
-
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
-                shader.setInt("material.specular", 1);
-
-                mesh->Draw(shader);
-            }
-        }
-        
-
-
+        RenderObjects(shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -232,4 +248,28 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+inline void RenderScene(Shader shader) {
+    
+    Camera* cam = GetUserCamera();
+    glm::mat4 view = cam->GetViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
+    glm::mat4 viewSky = glm::mat4(glm::mat3(view));
+    RenderObjects(shader);
+}
+
+inline void RenderObjects(Shader shader) {
+    for (auto obj : GetSceneObjects()) {
+        shader.setMat4("model", obj->transform.GetMatrix());
+        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
+            shader.setInt("material.diffuse", 0);                
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
+            shader.setInt("material.specular", 1);                
+            mesh->Draw(shader);
+        }
+    }
 }
