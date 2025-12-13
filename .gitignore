@@ -22,3 +22,4 @@ PointEngine
 
 compile_commands.json
 .cmake
+bin/
