@@ -17,7 +17,6 @@
 
 using namespace PointEngine;
 
-// Internal engine state
 namespace {
     double g_deltaTime = 0.0;
     const unsigned int WIDTH = 800;
@@ -26,15 +25,12 @@ namespace {
     bool AntiAliasing = true;
     unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
     int width, height;
-
-   
 }
 
-// Forward declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 inline void RenderScene(Shader shader);
 inline void RenderObjects(Shader shader);
-// Public API implementation
+
 namespace PointEngine {
     double GetDeltaTime() {
         return g_deltaTime;
@@ -46,6 +42,14 @@ namespace PointEngine {
 
     const unsigned int WIDTH = 800;
     const unsigned int HEIGHT = 600;
+
+        double oldTimeSinceStart = 0.0;
+
+    double fpsTimer = 0.0;
+    int frames = 0;
+    int fps = 0;
+    
+    double now;
 }
 
 int main()
@@ -126,49 +130,6 @@ int main()
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
     Shader skyboxShader("./resources/shaders/skybox/shader.vs", "./resources/shaders/skybox/shader.fs");
     
-    /*
-    Shader DepthShader("resources/shaders/light/shadow_mapping.vs", "resources/shaders/light/shadow_mapping.fs");
-    Shader debugDepthQuad("resources/shaders/light/shadowMapping/debug_quad/debug_quad.vs", "resources/shaders/light/shadowMapping/debug_quad/debug_quad.fs");
-    */
-
-    /*
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-    unsigned int depthMapFBO;
-    glGenFramebuffers(1, &depthMapFBO);
-    
-    // create depth texture
-    unsigned int depthMap;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    // attach depth texture as FBO's depth buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // shaders configuration uwu
-    shader.use();
-    shader.setInt("diffuseTexture", 0);
-    shader.setInt("shadowMap", 1);
-    debugDepthQuad.use();
-    debugDepthQuad.setInt("depthMap", 0);
- */
-    double oldTimeSinceStart = 0.0;
-
-    double fpsTimer = 0.0;
-    int frames = 0;
-    int fps = 0;
-    
-    unsigned int texture;
-    double now;
-    
     Start();
 
     std::vector<std::string> faces
@@ -184,19 +145,7 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        now = glfwGetTime();
-        SetDeltaTime(now - oldTimeSinceStart);
-        oldTimeSinceStart = now;
-
-        fpsTimer += GetDeltaTime();
-        frames++;
-
-        if (fpsTimer >= 1.0) {
-            fps = frames;
-            frames = 0;
-            fpsTimer = 0.0;
-            std::cout << "FPS: " << fps << std::endl;
-        }
+        calculateFPS();
 
         glfwGetFramebufferSize(window, &width, &height);
         
@@ -237,21 +186,16 @@ int main()
     }
 
     End();
-    //glDeleteVertexArrays(1, &VAO);
-    //glDeleteBuffers(1, &VBO);
-    //glDeleteProgram(shader.ID);
     
     glfwTerminate();
     return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
 inline void RenderScene(Shader shader) {
-    
     Camera* cam = GetUserCamera();
     glm::mat4 view = cam->GetViewMatrix();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
@@ -272,4 +216,20 @@ inline void RenderObjects(Shader shader) {
             mesh->Draw(shader);
         }
     }
+}
+
+inline void PointEngine::calculateFPS() {
+        now = glfwGetTime();
+        SetDeltaTime(now - oldTimeSinceStart);
+        oldTimeSinceStart = now;
+
+        fpsTimer += GetDeltaTime();
+        frames++;
+
+        if (fpsTimer >= 1.0) {
+            fps = frames;
+            frames = 0;
+            fpsTimer = 0.0;
+            std::cout << "FPS: " << fps << std::endl;
+        }
 }
