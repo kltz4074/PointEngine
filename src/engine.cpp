@@ -214,7 +214,7 @@ int main()
         glfwSetKeyCallback(window, key_callback);
         glfwSetWindowSizeCallback(window, framebuffer_size_callback);
         ProcessInput(window);
-        // Bind our framebuffer so we render the scene into the texture attachment.
+        
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, width, height);
         glEnable(GL_DEPTH_TEST);
@@ -241,17 +241,13 @@ int main()
         UploadLightsToShader(shader);
         RenderObjects(shader);
 
-        
-        // finished rendering scene to FBO; switch back to default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // Reset viewport to window size in case it differs
         glViewport(0, 0, width, height);
-        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-        // clear all relevant buffers
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+        glDisable(GL_DEPTH_TEST);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
         glClear(GL_COLOR_BUFFER_BIT);
         
