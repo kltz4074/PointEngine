@@ -178,9 +178,6 @@ int main()
     glGenTextures(1, &textureColorbuffer);
     glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 
-    // Ensure we have the actual framebuffer size before allocating the texture.
-    // `width` and `height` are declared but not initialized earlier, which
-    // can lead to creating a 0-sized texture and an incomplete framebuffer.
     glfwGetFramebufferSize(window, &width, &height);
     if (width <= 0 || height <= 0) {
         width = PointEngine::WIDTH;
