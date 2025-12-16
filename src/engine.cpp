@@ -25,9 +25,12 @@ namespace {
     bool AntiAliasing = true;
     unsigned int DefaultVBO, DefaultVAO, DefaultEBO;
     int width, height;
+    // Framebuffer objects for offscreen rendering (created in main)
+    unsigned int framebuffer = 0;
+    unsigned int textureColorbuffer = 0;
+    unsigned int rbo = 0;
 }
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void framebuffer_size_callback(GLFWwindow* window, int w, int h);
 inline void RenderScene(Shader shader);
 inline void RenderObjects(Shader shader);
 
@@ -108,6 +111,17 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
     
+    float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    };
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_MULTISAMPLE);
@@ -127,8 +141,20 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glBindVertexArray(0);
 
+    unsigned int quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
     Shader skyboxShader("./resources/shaders/skybox/shader.vs", "./resources/shaders/skybox/shader.fs");
+    Shader screenShader("./resources/shaders/framebuffer/framebuffers_screen.vs", "./resources/shaders/framebuffer/framebuffers_screen.fs");
     
     Start();
 
@@ -143,10 +169,43 @@ int main()
     };
     unsigned int cubemapTexture = loadCubemap(faces);
 
+
+    screenShader.use();
+    screenShader.setInt("screenTexture", 0);
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+
+    // Ensure we have the actual framebuffer size before allocating the texture.
+    // `width` and `height` are declared but not initialized earlier, which
+    // can lead to creating a 0-sized texture and an incomplete framebuffer.
+    glfwGetFramebufferSize(window, &width, &height);
+    if (width <= 0 || height <= 0) {
+        width = PointEngine::WIDTH;
+        height = PointEngine::HEIGHT;
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+    
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     while (!glfwWindowShouldClose(window))
     {
         calculateFPS();
 
+        
         glfwGetFramebufferSize(window, &width, &height);
         
         Camera* cam = GetUserCamera();
@@ -156,9 +215,13 @@ int main()
 
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetKeyCallback(window, key_callback);
-        
+        glfwSetWindowSizeCallback(window, framebuffer_size_callback);
         ProcessInput(window);
-        glClearColor(0.01, 0.01 ,0.01, 1.0f);
+        // Bind our framebuffer so we render the scene into the texture attachment.
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glViewport(0, 0, width, height);
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         glDepthFunc(GL_LEQUAL);
@@ -181,6 +244,26 @@ int main()
         UploadLightsToShader(shader);
         RenderObjects(shader);
 
+        
+        // finished rendering scene to FBO; switch back to default framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Reset viewport to window size in case it differs
+        glViewport(0, 0, width, height);
+        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+        // clear all relevant buffers
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        screenShader.use();  
+        glBindVertexArray(quadVAO);
+        glDisable(GL_DEPTH_TEST);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glDrawArrays(GL_TRIANGLES, 0, 6);  
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -192,7 +275,27 @@ int main()
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    // Update OpenGL viewport
     glViewport(0, 0, width, height);
+    // Update stored sizes
+    ::width = width;
+    ::height = height;
+
+    // If our FBO is created, resize its attachments to match the new size
+    if (framebuffer != 0) {
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ::width, ::height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, ::width, ::height);
+
+        // Validate framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete after resize!" << std::endl;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 
 inline void RenderScene(Shader shader) {
@@ -219,17 +322,17 @@ inline void RenderObjects(Shader shader) {
 }
 
 inline void PointEngine::calculateFPS() {
-        now = glfwGetTime();
-        SetDeltaTime(now - oldTimeSinceStart);
-        oldTimeSinceStart = now;
-
-        fpsTimer += GetDeltaTime();
-        frames++;
-
-        if (fpsTimer >= 1.0) {
-            fps = frames;
-            frames = 0;
-            fpsTimer = 0.0;
-            std::cout << "FPS: " << fps << std::endl;
-        }
+    now = glfwGetTime();
+    SetDeltaTime(now - oldTimeSinceStart);
+    
+    oldTimeSinceStart = now;
+    fpsTimer += GetDeltaTime();
+    frames++;
+    
+    if (fpsTimer >= 1.0) {
+        fps = frames;
+        frames = 0;
+        fpsTimer = 0.0;
+        std::cout << "FPS: " << fps << std::endl;
+    }
 }
