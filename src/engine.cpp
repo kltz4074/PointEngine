@@ -197,15 +197,14 @@ int main()
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    Camera* cam = GetUserCamera();
+
     while (!glfwWindowShouldClose(window))
     {
         calculateFPS();
-
         
         glfwGetFramebufferSize(window, &width, &height);
         
-        Camera* cam = GetUserCamera();
         glm::mat4 view = cam->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
         glm::mat4 viewSky = glm::mat4(glm::mat3(view));
@@ -246,14 +245,9 @@ int main()
         glDisable(GL_DEPTH_TEST);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
-        glClear(GL_COLOR_BUFFER_BIT);
         
         screenShader.use();  
         glBindVertexArray(quadVAO);
-        glDisable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);  
 

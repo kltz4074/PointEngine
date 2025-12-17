@@ -28,8 +28,6 @@ std::vector<DirectionalLight*>& GetDirectionalLights() {
 void UploadLightsToShader(const Shader& shader) {
     // ---------- Directional Lights ----------
     int dirIndex = 0;
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_WEIGHT = 1024;
-    unsigned int dephMap;
     for (auto light : directionalLights) {
         std::string base = "dirLights[" + std::to_string(dirIndex) + "]";
         shader.setVec3(base + ".direction", light->transform.rotation);
