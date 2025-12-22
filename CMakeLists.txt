@@ -43,6 +43,7 @@ add_executable(PointEngine
     src/components/Light/PointLight.cpp
     src/components/Light/DirectionalLight.cpp
     src/components/Meshes/Cube.cpp
+    src/components/Model.cpp
     src/game/game.cpp
 )
 
