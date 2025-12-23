@@ -109,7 +109,7 @@ namespace PointEngine {
 
     void End() {
         RemoveObjs();
-        std::cout << "game ended :</n";
+        std::cout << "game ended :<" << std::endl;
     }
 
     void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
