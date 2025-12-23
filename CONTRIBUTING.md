@@ -2,4 +2,4 @@
 # Contributing
 ### Contributions are welcome!!❤️‍🔥❤️‍🔥. 
 
-### if you want to help me with my project I will only be happy and grateful❤️❤️
+## tutorial how to start working on PointEngine wrote in [PointEngine wiki!](https://github.com/kltz4074/PointEngine/wiki/Learning-Path#learning-path--how-to-get-started-with-pointengine)
