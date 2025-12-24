@@ -4,6 +4,7 @@
 #include "../core/stb_image.h"
 #include <rapidobj/rapidobj.hpp>
 #include <glad/glad.h>
+#include <iostream>
 
 void Model::loadOBJ(const std::string& ObjPath) {
     rapidobj::Result result = rapidobj::ParseFile(ObjPath);

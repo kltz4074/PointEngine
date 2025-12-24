@@ -1,7 +1,6 @@
 #include "GameObject.h"
 #include <glad/glad.h>
 #include <vector>
-#include "Mesh.h"
 namespace PointEngine {
 
 Transform::Transform()
@@ -30,15 +29,6 @@ void GameObject::Update() {}
 void AddGameObject(GameObject* obj) {
     sceneObjects.push_back(obj);
 }
-
-void DrawAll(Shader shader) {
-    for (auto obj : sceneObjects) {
-        if (auto mesh = dynamic_cast<Mesh*>(obj)) {
-            mesh->Draw(shader);
-        }
-    }
-}
-
 
 // even more cool stuff broh
 void RemoveObjs() {

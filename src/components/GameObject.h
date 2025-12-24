@@ -32,7 +32,6 @@ public:
 
 // Scene management functions
 void AddGameObject(GameObject* obj);
-void DrawAll(unsigned int shaderProgram, unsigned int VAO);
 void RemoveObjs();
 
 // Get all scene objects (for iteration)

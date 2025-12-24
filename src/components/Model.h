@@ -1,15 +1,12 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <cstddef>
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
 #include "../core/stb_image.h"
 #include <rapidobj/rapidobj.hpp>
-#include <filesystem>
-#include <iostream>
 #include <glad/glad.h>
 struct Vertex {
     glm::vec3 position;

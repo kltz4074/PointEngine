@@ -303,7 +303,26 @@ inline void RenderObjects(Shader shader) {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
             shader.setInt("material.specular", 1);                
-            mesh->Draw(shader);
+            
+                if (mesh->model.ModelLoaded) {
+                    glBindVertexArray(mesh->model.VAO);
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
+
+                    glDrawElements(GL_TRIANGLES, mesh->model.indices.size(), GL_UNSIGNED_INT, 0);
+
+                    glBindVertexArray(0);
+                } else {
+                    glBindVertexArray(mesh->model.VAO);
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
+
+                    glDrawElements(GL_TRIANGLES, mesh->model.indices.size(), GL_UNSIGNED_INT, 0);
+
+                    glBindVertexArray(0);
+                }
         }
     }
 }
