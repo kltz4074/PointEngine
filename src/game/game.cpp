@@ -68,8 +68,7 @@ namespace PointEngine {
         pickle->transform.scale *= 0.02;
         pickle->material.shininess = 10;
         pickle->material.LoadTexture("resources/Textures/cucumber.jpg");
-        pickle->model.loadOBJ("resources/Models/DefaultModel/Pickle.obj");
-        pickle->model.setupMesh();
+        pickle->model.LoadModel("resources/Models/DefaultModel/Pickle.obj");
         AddGameObject(pickle);
 
         plane = new Mesh;
@@ -82,15 +81,13 @@ namespace PointEngine {
         city->transform.position = { 1, 0.2, 0 };
         city->transform.scale *= 0.2;
         city->material.LoadTexture("resources/Models/xdlol/texture4k.png");
-        city->model.loadOBJ("resources/Models/xdlol/uwu.obj");
-        city->model.setupMesh();
+        city->model.LoadModel("resources/Models/xdlol/uwu.obj");
         AddGameObject(city); 
 
         mikuPlush = new Mesh;
         mikuPlush->transform.position = {0, 3, 0};
         mikuPlush->material.LoadTexture("resources/Models/miku/miku.png");
-        mikuPlush->model.loadOBJ("resources/Models/miku/miku.obj");
-        mikuPlush->model.setupMesh();
+        mikuPlush->model.LoadModel("resources/Models/miku/miku.obj");
         AddGameObject(mikuPlush); 
         
         forward = glm::vec3(0.0f, 0.0f, -1.0f);
