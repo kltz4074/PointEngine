@@ -27,25 +27,5 @@ void Material::LoadTexture(const std::string TexturePath) {
     stbi_image_free(data);
 }
 
-void Mesh::Draw(Shader shader) {
-    if (model.ModelLoaded) {
-        glBindVertexArray(model.VAO);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.DiffuseTextureID);
-
-        glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
-    } else {
-        glBindVertexArray(model.VAO);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, material.DiffuseTextureID);
-
-        glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
-    }
-}
 } // namespace PointEngine

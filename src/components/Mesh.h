@@ -5,7 +5,6 @@
 #include <string>
 #include <glad/glad.h>
 #include "../core/stb_image.h"
-#include "../core/shader.h"
 #include "Model.h"
 namespace PointEngine {
 
@@ -21,8 +20,6 @@ class Mesh : public GameObject {
 public:
     Material material;
     Model model;
-
-    void Draw(Shader shader);
 };
 
 } // namespace PointEngine

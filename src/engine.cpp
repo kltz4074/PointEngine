@@ -197,13 +197,12 @@ int main()
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     Camera* cam = GetUserCamera();
 
     while (!glfwWindowShouldClose(window))
     {
         calculateFPS();
-        
+        glEnable(GL_DEPTH_TEST);
         glfwGetFramebufferSize(window, &width, &height);
         
         glm::mat4 view = cam->GetViewMatrix();
@@ -217,8 +216,7 @@ int main()
         
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, width, height);
-        glEnable(GL_DEPTH_TEST);
-        glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
+        glClearColor(0.01f, 0.01f, 0.01f, 0.5f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         glDepthFunc(GL_LEQUAL);
@@ -248,6 +246,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         
         screenShader.use();  
+        
         glBindVertexArray(quadVAO);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);  
