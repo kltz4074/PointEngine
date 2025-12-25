@@ -76,12 +76,12 @@ void Model::setupMesh() {
                     indices.data(),
                     GL_STATIC_DRAW);
 
-    // --- layout позиции ---
+    // --- layout positions ---
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
                             sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-    // --- layout нормали ---
+    // --- layout normals ---
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
                             sizeof(Vertex), (void*)offsetof(Vertex, normal));

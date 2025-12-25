@@ -10,6 +10,7 @@
 #include "core/stb_image.h"
 #include "components/GameObject.h"
 #include "components/Camera.h"
+#include "components/Mesh.h"
 #include "game/game.h"
 #include "components/LightManager.h"
 #include "components/Meshes/Cube.h"

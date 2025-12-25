@@ -3,12 +3,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../components/GameObject.h"
 #include "../components/Camera.h"
-#include "../components/Mesh.h"
 #include "../components/Light/PointLight.h"
 #include "../components/Light/DirectionalLight.h"
-#include "../engine.h"
 
 namespace PointEngine {
 

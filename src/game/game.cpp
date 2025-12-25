@@ -7,7 +7,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/trigonometric.hpp>
-#include "../components/Model.h"
+#include "../components/Mesh.h"
 using namespace PointEngine;
 
 // Game state
