@@ -13,13 +13,11 @@
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-9cf.svg)]()
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-orange.svg)]()
 
-PointEngine is a lightweight, open-source 3D engine written in C++ using OpenGL. PointEngine is in the very early stages of development and aims to be fast, extensible, and scriptable (Lua support planned).
-
+PointEngine - fully cross-platform lightweight Game Engine on c++ openGL
 ---
 
 Contents
 - About
-- Getting started
 - Roadmap
 - License
 - Author & Contact
@@ -35,57 +33,21 @@ PointEngine is planned to have:
 - Flexible component system (like Unity :> )
 - Easy coding API
 
----
-Getting started
----------------
-Requirements
-- C++17 (or newer) compiler
-- CMake 3.26+ (or newer)
-- OpenGL development headers / drivers
-
-build variants:
-
-Windows:
-   - git clone https://github.com/kltz4074/PointEngine
-   - cd PointEngine
-   - mkdir build
-   - cd build
-   - cmake ..
-   - cmake --build .. --config Release
-   - cd ..
-   - start build/PointEngine.exe
-
-Linux / MacOS:
-   - git clone https://github.com/kltz4074/PointEngine
-   - cd PointEngine
-   - cmake .
-   - make
-   - ./PointEngine
-
----
-
 Roadmap
 -------
 (early — will be expanded)
 - [x] Stabilize C++ core and public API
+- [ ] Hub (PointHub) for PointEngine's version management and project management
+- [ ] Editor (PointEngineEditor) for scene building and asset management
 - [ ] Photorealistic light system
 - [ ] Add Lua scripting binding for game logic
 - [ ] Add physics integration and basic particle/chemical reaction modules
-- [ ] Editor (PointEngineEditor) for scene building and asset management
 - [ ] Documentation site (GitHub Pages) and tutorials
 If you want to help shape the roadmap, open an issue or PR.
 
 License
 -------
 PointEngine is released under the MIT License. See the LICENSE file for details.
-
-Author & Contact
-----------------
-Author: [kltzqu](https://kltz4074.github.io)
-
-
-
-
 
 
 
