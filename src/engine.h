@@ -43,14 +43,11 @@ inline void calculateFPS();
 double GetDeltaTime();
 
 /**
- * @brief set the delta time (internal use only (as i understand))
+ * @brief set the delta time
  * @param dt delta time in seconds
  */
 void SetDeltaTime(double dt);
 
-// Source - https://stackoverflow.com/q
-// Posted by Swatcat, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-12-02, License - CC BY-SA 3.0
 } // namespace PointEngine
 
 #endif // ENGINE_H

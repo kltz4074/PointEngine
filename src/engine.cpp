@@ -39,7 +39,7 @@ namespace PointEngine {
     double GetDeltaTime() {
         return g_deltaTime;
     }
-    
+
     void SetDeltaTime(double dt) {
         g_deltaTime = dt;
     }
@@ -52,7 +52,7 @@ namespace PointEngine {
     double fpsTimer = 0.0;
     int frames = 0;
     int fps = 0;
-    
+
     double now;
 }
 
@@ -66,7 +66,7 @@ int main()
         glfwWindowHint(GLFW_SAMPLES, 8);
     }
 
-    
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -83,7 +83,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(VsyncEnabled ? 1 : 0); 
+    glfwSwapInterval(VsyncEnabled ? 1 : 0);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -111,7 +111,7 @@ int main()
 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    
+
     float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
         // positions   // texCoords
         -1.0f,  1.0f,  0.0f, 1.0f,
@@ -126,11 +126,11 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_MULTISAMPLE);
-    
+
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
     glEnable(GL_LIGHT3);
-    
+
     unsigned int skyboxVAO, skyboxVBO;
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
@@ -156,7 +156,7 @@ int main()
     Shader shader("./resources/shaders/shader.vs", "./resources/shaders/shader.fs");
     Shader skyboxShader("./resources/shaders/skybox/shader.vs", "./resources/shaders/skybox/shader.fs");
     Shader screenShader("./resources/shaders/framebuffer/framebuffers_screen.vs", "./resources/shaders/framebuffer/framebuffers_screen.fs");
-    
+
     Start();
 
     std::vector<std::string> faces
@@ -189,7 +189,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
 
-    
+
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
@@ -204,7 +204,7 @@ int main()
         calculateFPS();
         glEnable(GL_DEPTH_TEST);
         glfwGetFramebufferSize(window, &width, &height);
-        
+
         glm::mat4 view = cam->GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 1000.0f);
         glm::mat4 viewSky = glm::mat4(glm::mat3(view));
@@ -213,12 +213,12 @@ int main()
         glfwSetKeyCallback(window, key_callback);
         glfwSetWindowSizeCallback(window, framebuffer_size_callback);
         ProcessInput(window);
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, width, height);
         glClearColor(0.01f, 0.01f, 0.01f, 0.5f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         glDepthFunc(GL_LEQUAL);
         glDepthMask(GL_FALSE);
         skyboxShader.use();
@@ -228,9 +228,9 @@ int main()
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glDepthMask(GL_TRUE);
-        
+
         Update();
-        
+
         shader.use();
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
@@ -244,19 +244,19 @@ int main()
         glDisable(GL_DEPTH_TEST);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
-        screenShader.use();  
-        
+
+        screenShader.use();
+
         glBindVertexArray(quadVAO);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-        glDrawArrays(GL_TRIANGLES, 0, 6);  
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     End();
-    
+
     glfwTerminate();
     return 0;
 }
@@ -300,14 +300,14 @@ inline void RenderObjects(Shader shader) {
             glActiveTexture(GL_TEXTURE0);
             if (mesh->material.DiffuseTextureID){
                 glBindTexture(GL_TEXTURE_2D, mesh->material.DiffuseTextureID);
-                shader.setInt("material.diffuse", 0);                
+                shader.setInt("material.diffuse", 0);
             }
             if (mesh->model.VAO) {
                 glBindVertexArray(mesh->model.VAO);
             } else {
                 glBindVertexArray(mesh->model.DefaultVAO);
             }
-            
+
 
             if (mesh->material.DiffuseTextureID) {
                 glActiveTexture(GL_TEXTURE0);
@@ -327,11 +327,11 @@ inline void RenderObjects(Shader shader) {
 inline void PointEngine::calculateFPS() {
     now = glfwGetTime();
     SetDeltaTime(now - oldTimeSinceStart);
-    
+
     oldTimeSinceStart = now;
     fpsTimer += GetDeltaTime();
     frames++;
-    
+
     if (fpsTimer >= 1.0) {
         fps = frames;
         frames = 0;

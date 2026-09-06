@@ -1,0 +1,9 @@
+prefix=/usr/local
+includedir=${prefix}/include
+
+Name: RapidObj
+Version: 1.1.0
+
+Requires:
+Libs: -pthread
+Cflags: -I${includedir}
